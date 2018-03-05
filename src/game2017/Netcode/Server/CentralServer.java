@@ -18,6 +18,7 @@ public class CentralServer {
     private ServerSocket serverSocket;
     private ServerData serverData;
 
+
     public static void main(String[] args) {
         CentralServer server = new CentralServer();
         server.run();
