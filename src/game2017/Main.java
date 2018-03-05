@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import game2017.Model.Player;
+import game2017.Netcode.Client.LocalClient;
+import game2017.Netcode.Server.CentralServer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.stage.Stage;
@@ -16,16 +18,16 @@ import javafx.scene.text.*;
 
 public class Main extends Application {
 
-	public static final int size = 20; 
-	public static final int scene_height = size * 20 + 100;
-	public static final int scene_width = size * 20 + 200;
+	private static final int size = 20;
+	private static final int scene_height = size * 20 + 100;
+	private static final int scene_width = size * 20 + 200;
 
-	public static Image image_floor;
-	public static Image image_wall;
-	public static Image hero_right,hero_left,hero_up,hero_down;
+	private static Image image_floor;
+	private static Image image_wall;
+	private static Image hero_right,hero_left,hero_up,hero_down;
 
-	public static Player me;
-	public static List<Player> players = new ArrayList<Player>();
+	private static Player me;
+	private static List<Player> players = new ArrayList<Player>();
 
 	private Label[][] fields;
 	private TextArea scoreList;
@@ -63,7 +65,10 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
-//		ClientOrServer();
+		ClientOrServer(primaryStage);
+	}
+
+	private void Client(Stage primaryStage) {
 		try {
 			GridPane grid = new GridPane();
 			grid.setHgap(10);
@@ -72,12 +77,12 @@ public class Main extends Application {
 
 			Text mazeLabel = new Text("Maze:");
 			mazeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-	
+
 			Text scoreLabel = new Text("Score:");
 			scoreLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 
 			scoreList = new TextArea();
-			
+
 			GridPane boardGrid = new GridPane();
 
 			image_wall  = new Image(getClass().getResourceAsStream("Image/wall4.png"),size,size,false,false);
@@ -92,41 +97,41 @@ public class Main extends Application {
 			for (int j=0; j<20; j++) {
 				for (int i=0; i<20; i++) {
 					switch (board[j].charAt(i)) {
-					case 'w':
-						fields[i][j] = new Label("", new ImageView(image_wall));
-						break;
-					case ' ':					
-						fields[i][j] = new Label("", new ImageView(image_floor));
-						break;
-					default: throw new Exception("Illegal field value: "+board[j].charAt(i) );
+						case 'w':
+							fields[i][j] = new Label("", new ImageView(image_wall));
+							break;
+						case ' ':
+							fields[i][j] = new Label("", new ImageView(image_floor));
+							break;
+						default: throw new Exception("Illegal field value: "+board[j].charAt(i) );
 					}
 					boardGrid.add(fields[i][j], i, j);
 				}
 			}
 			scoreList.setEditable(false);
-			
-			
-			grid.add(mazeLabel,  0, 0); 
-			grid.add(scoreLabel, 1, 0); 
+
+
+			grid.add(mazeLabel,  0, 0);
+			grid.add(scoreLabel, 1, 0);
 			grid.add(boardGrid,  0, 1);
 			grid.add(scoreList,  1, 1);
-						
+
 			Scene scene = new Scene(grid,scene_width,scene_height);
 			primaryStage.setScene(scene);
 			primaryStage.show();
 
 			scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
 				switch (event.getCode()) {
-				case UP:    playerMoved(0,-1,"up");    break;
-				case DOWN:  playerMoved(0,+1,"down");  break;
-				case LEFT:  playerMoved(-1,0,"left");  break;
-				case RIGHT: playerMoved(+1,0,"right"); break;
-				default: break;
+					case UP:    playerMoved(0,-1,"up");    break;
+					case DOWN:  playerMoved(0,+1,"down");  break;
+					case LEFT:  playerMoved(-1,0,"left");  break;
+					case RIGHT: playerMoved(+1,0,"right"); break;
+					default: break;
 				}
 			});
-			
-            // Setting up standard players
-			
+
+			// Setting up standard players
+
 			me = new Player("Orville",9,4,"up");
 			players.add(me);
 			fields[9][4].setGraphic(new ImageView(hero_up));
@@ -197,9 +202,9 @@ public class Main extends Application {
 		return null;
 	}
 
-	private void ClientOrServer() {
-		Alert alert = ShowAlertMessage("Connect to server...", "Please input IP and PORT",
-				"Create a connection to a server");
+	private void ClientOrServer(Stage stage) {
+		Alert alert = ShowAlertMessage("Server (NO) eller Klient (YES)", "Indtast IP og/eller Port",
+				"Vaelg YES hvis du der KLIENT eller NO for Server");
 
 		GridPane pane = new GridPane();
 		pane.setMaxWidth(Double.MAX_VALUE);
@@ -227,6 +232,17 @@ public class Main extends Application {
 		if (alert.getResult() == ButtonType.YES) {
 			String IP = local_IP_Field.getText();
 			int PORT = Integer.parseInt(local_PORT_Field.getText());
+
+//			LocalClient localClient = new LocalClient(IP, PORT);
+//			localClient.start();
+
+			Client(stage);
+		} else if (alert.getResult() == ButtonType.NO) {
+
+			int PORT = Integer.parseInt(local_PORT_Field.getText());
+
+//			CentralServer centralServer = new CentralServer(PORT);
+//			centralServer.start();
 		}
 	}
 	private Alert ShowAlertMessage(String title, String header, String context) {
@@ -235,7 +251,7 @@ public class Main extends Application {
 		alert.setHeaderText(header);
 		alert.setContentText(context);
 		alert.getButtonTypes().clear();
-		alert.getButtonTypes().addAll(ButtonType.YES, ButtonType.CANCEL);
+		alert.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
 
 		return alert;
 	}

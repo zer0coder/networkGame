@@ -1,6 +1,7 @@
 package game2017.Netcode.Client;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -13,11 +14,12 @@ import java.net.UnknownHostException;
  */
 public class LocalClient extends Thread {
 
-    private int portNumber = 50000;
+    private int portNumber;
+    private String serverName;
 
-    public static void main(String[] args) throws IOException {
-        LocalClient client = new LocalClient();
-        client.run("10.24.0.193");
+    public LocalClient(String IP, int portNumber) {
+        this.serverName = IP;
+        this.portNumber = portNumber;
     }
 
     /**
@@ -50,8 +52,7 @@ public class LocalClient extends Thread {
         return res;
     }
 
-    private void run(String serverName) {
-        System.out.println("Type CTRL-D to shut down the client.");
+    public void run() {
 
         printLocalHostAddress();
 
@@ -60,8 +61,11 @@ public class LocalClient extends Thread {
         if (socket != null) {
             System.out.println("Connected to " + socket);
 
-
             try {
+
+                PrintWriter writer = new PrintWriter(socket.getOutputStream());
+                writer.println("Hello Server");
+                writer.flush();
 
                 socket.close();
 
@@ -69,5 +73,7 @@ public class LocalClient extends Thread {
                 // We ignore IOExceptions
             }
         }
+
+        System.out.println("LocalClient ended...");
     }
 }

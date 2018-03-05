@@ -1,9 +1,13 @@
 package game2017.Netcode.Server;
 
 import game2017.Model.Player;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +22,7 @@ public class ConnectedClient extends Thread {
 
     private Socket socket;
     private Player player;
-    public static List<Player> players = new ArrayList<Player>();
-    private TextArea scoreList;
+    private List<Player> players = new ArrayList<Player>();
     private  String[] board = {    // 20x20
             "wwwwwwwwwwwwwwwwwwww",
             "w        ww        w",
@@ -49,7 +52,14 @@ public class ConnectedClient extends Thread {
 
     @Override
     public void run() {
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+            System.out.println("Client: " + reader.readLine());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void playerMoved(int delta_x, int delta_y, String direction) {
@@ -67,36 +77,14 @@ public class ConnectedClient extends Thread {
             } else {
                 player.addPoints(1);
 
-                fields[x][y].setGraphic(new ImageView(image_floor));
                 x+=delta_x;
                 y+=delta_y;
 
-                if (direction.equals("right")) {
-                    fields[x][y].setGraphic(new ImageView(hero_right));
-                };
-                if (direction.equals("left")) {
-                    fields[x][y].setGraphic(new ImageView(hero_left));
-                };
-                if (direction.equals("up")) {
-                    fields[x][y].setGraphic(new ImageView(hero_up));
-                };
-                if (direction.equals("down")) {
-                    fields[x][y].setGraphic(new ImageView(hero_down));
-                };
 
                 player.setXpos(x);
                 player.setYpos(y);
             }
         }
-        scoreList.setText(getScoreList());
-    }
-
-    public String getScoreList() {
-        StringBuffer b = new StringBuffer(100);
-        for (Player p : players) {
-            b.append(p+"\r\n");
-        }
-        return b.toString();
     }
 
     public Player getPlayerAt(int x, int y) {
