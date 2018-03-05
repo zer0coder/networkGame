@@ -3,6 +3,7 @@ package game2017;
 import java.util.ArrayList;
 import java.util.List;
 
+import game2017.Model.Player;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.stage.Stage;
@@ -62,6 +63,7 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
+//		ClientOrServer();
 		try {
 			GridPane grid = new GridPane();
 			grid.setHgap(10);
@@ -140,7 +142,7 @@ public class Main extends Application {
 	}
 
 	public void playerMoved(int delta_x, int delta_y, String direction) {
-		me.direction = direction;
+		me.setDirection(direction);
 		int x = me.getXpos(),y = me.getYpos();
 
 		if (board[y+delta_y].charAt(x+delta_x)=='w') {
@@ -193,6 +195,49 @@ public class Main extends Application {
 			}
 		}
 		return null;
+	}
+
+	private void ClientOrServer() {
+		Alert alert = ShowAlertMessage("Connect to server...", "Please input IP and PORT",
+				"Create a connection to a server");
+
+		GridPane pane = new GridPane();
+		pane.setMaxWidth(Double.MAX_VALUE);
+		pane.setHgap(10);
+		pane.setVgap(10);
+		TextField local_IP_Field = new TextField("192.168.0.13");
+		TextField local_PORT_Field = new TextField("50003");
+		TextField local_USER_field = new TextField("User 1");
+
+		local_IP_Field.setMaxWidth(Double.MAX_VALUE);
+		local_PORT_Field.setMaxWidth(Double.MAX_VALUE);
+		local_USER_field.setMaxWidth(Double.MAX_VALUE);
+
+		pane.add(new Label("IP:"), 0, 0);
+		pane.add(local_IP_Field,1,0);
+		pane.add(new Label("PORT:"), 0, 1);
+		pane.add(local_PORT_Field,1,1);
+		pane.add(new Label("USER:"), 0, 2);
+		pane.add(local_USER_field, 1, 2);
+
+		alert.getDialogPane().setContent(pane);
+		alert.setWidth(300);
+		alert.showAndWait();
+
+		if (alert.getResult() == ButtonType.YES) {
+			String IP = local_IP_Field.getText();
+			int PORT = Integer.parseInt(local_PORT_Field.getText());
+		}
+	}
+	private Alert ShowAlertMessage(String title, String header, String context) {
+		Alert alert = new Alert(Alert.AlertType.WARNING);
+		alert.setTitle(title);
+		alert.setHeaderText(header);
+		alert.setContentText(context);
+		alert.getButtonTypes().clear();
+		alert.getButtonTypes().addAll(ButtonType.YES, ButtonType.CANCEL);
+
+		return alert;
 	}
 
 	public static void main(String[] args) {

@@ -1,11 +1,14 @@
-package game2017;
+package game2017.Model;
 
-public class Player {
-	String name;
-	int xpos;
-	int ypos;
-	int point;
-	String direction;
+import java.io.Serializable;
+
+public class Player implements Serializable {
+	private String name;
+	private int xpos;
+	private int ypos;
+	private int point;
+	private String direction;
+	private boolean alive = true;
 
 	public Player(String name, int xpos, int ypos, String direction) {
 		this.name = name;
@@ -38,5 +41,13 @@ public class Player {
 	}
 	public String toString() {
 		return name+":   "+point;
+	}
+
+	public boolean isAlive() {
+		return alive;
+	}
+
+	public void setAlive(boolean alive) {
+		this.alive = alive;
 	}
 }
