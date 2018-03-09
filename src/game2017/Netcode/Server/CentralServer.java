@@ -92,11 +92,14 @@ public class CentralServer extends Thread {
         registerOnPort();
         loadMaps();
 
+
+
         while (true) {
             Socket socket = waitForConnectionFromClient();
 
             if (socket != null) {
                 ConnectedClient connectedClient = new ConnectedClient(socket, Maps.getMap(mapNumber));
+//                MessageRelay relay = new MessageRelay(socket, )
                 connectedClient.start();
                 System.out.println("Connection from " + socket);
 

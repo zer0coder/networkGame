@@ -41,8 +41,6 @@ public class ConnectedClient extends Thread {
             // TODO: Read User info
             message = inputStream.readLine();
 
-            System.out.println(message);
-
             // Read what the client is sending
             while (message != null) {
                 message = inputStream.readLine();
