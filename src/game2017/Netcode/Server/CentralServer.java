@@ -18,6 +18,11 @@ public class CentralServer extends Thread {
     private ServerSocket serverSocket;
     private ServerData serverData;
 
+    public static void main(String[] args) {
+        CentralServer centralServer = new CentralServer(50000);
+        centralServer.start();
+    }
+
     public CentralServer(int portNumber) {
         this.portNumber = portNumber;
         serverData = new ServerData();

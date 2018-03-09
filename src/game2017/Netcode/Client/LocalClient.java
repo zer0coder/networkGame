@@ -1,10 +1,16 @@
 package game2017.Netcode.Client;
 
+import game2017.Queues.IncomingMessageQueue;
+import game2017.Queues.OutgoingMessageQueue;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Author:  Francisco
@@ -16,6 +22,8 @@ public class LocalClient extends Thread {
 
     private int portNumber;
     private String serverName;
+    private BlockingQueue<String> outgoingMessages;
+    private BlockingQueue<String> incomingMessages;
 
     public LocalClient(String IP, int portNumber) {
         this.serverName = IP;
@@ -30,7 +38,7 @@ public class LocalClient extends Thread {
         try {
             InetAddress localhost = InetAddress.getLocalHost();
             String localhostAddress = localhost.getHostAddress();
-            System.out.println("I'm a client running with IP address " + localhostAddress);
+            System.out.println("I'm a client running with IP address " + localhostAddress + ":" + portNumber);
         } catch (UnknownHostException e) {
             System.err.println("Cannot resolve the Internet address of the local host.");
             System.err.println(e);
@@ -42,38 +50,77 @@ public class LocalClient extends Thread {
      *
      * Connects to the server on IP address serverName and port number portNumber.
      */
-    private Socket connectToServer(String serverName) {
+    private Socket connectToServer() {
         Socket res = null;
         try {
-            res = new Socket(serverName,portNumber);
+            res = new Socket(serverName, portNumber);
         } catch (IOException e) {
-            // We return null on IOExceptions
+            System.err.println(e);
         }
         return res;
     }
 
+
     public void run() {
-
         printLocalHostAddress();
+        Socket socket = connectToServer();
 
-        Socket socket = connectToServer(serverName);
+        outgoingMessages = OutgoingMessageQueue.getOutgoingMessages();
+        incomingMessages = IncomingMessageQueue.getIncomingMessages();
+        PrintWriter outputStream;
+        String message;
 
         if (socket != null) {
             System.out.println("Connected to " + socket);
 
+            Reciever reciever = new Reciever(socket);
+            reciever.start();
+
             try {
 
-                PrintWriter writer = new PrintWriter(socket.getOutputStream());
-                writer.println("Hello Server");
-                writer.flush();
+                outputStream = new PrintWriter(socket.getOutputStream());
+
+
+                while((message = outgoingMessages.take()) != null) {
+                    outputStream.println(message);
+                    outputStream.flush();
+                }
 
                 socket.close();
 
             } catch (IOException e) {
-                // We ignore IOExceptions
+                System.out.println("Local client error: " + e.getMessage());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 
-        System.out.println("LocalClient ended...");
+        System.out.println("Local client dead...");
+    }
+
+    private class Reciever extends Thread {
+
+        Socket socket;
+        BufferedReader inputStream;
+
+        Reciever(Socket socket) {
+            this.socket = socket;
+        }
+
+        public void run() {
+            try {
+                inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                String message;
+
+                message = inputStream.readLine();
+                while(message != null) {
+                    message = inputStream.readLine();
+                    incomingMessages.add(message);
+                }
+
+            } catch (IOException e) {
+                System.out.println("Reciever error: " + e.getMessage());
+            }
+        }
     }
 }
