@@ -1,4 +1,4 @@
-package game2017.Queues;
+package game2017.StorageData.Queues;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

@@ -1,7 +1,7 @@
 package game2017;
 
 import game2017.Model.Player;
-import game2017.Netcode.Server.CentralServer;
+import game2017.Netcode.Client.LocalClient;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -67,9 +67,7 @@ public class Main_Client extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
-//		ClientOrServer(primaryStage);
- 		CentralServer centralServer = new CentralServer(PORT);
-  	    centralServer.start();
+		CreateClientToServerConnection(primaryStage);
 	}
 
 	private void Client(Stage primaryStage) {
@@ -206,9 +204,9 @@ public class Main_Client extends Application {
 		return null;
 	}
 
-	private void ClientOrServer(Stage stage) {
-		Alert alert = ShowAlertMessage("Server (NO) eller Klient (YES)", "Indtast IP og/eller Port",
-				"Vaelg YES hvis du der KLIENT eller NO for Server");
+	private void CreateClientToServerConnection(Stage stage) {
+		Alert alert = ShowAlertMessage("Forbind til Server", "Indtast IP og/eller Port",
+				"Indtast venligst IP og PORT");
 
 		GridPane pane = new GridPane();
 		pane.setMaxWidth(Double.MAX_VALUE);
@@ -237,16 +235,10 @@ public class Main_Client extends Application {
 			String IP = local_IP_Field.getText();
 			int PORT = Integer.parseInt(local_PORT_Field.getText());
 
-//			LocalClient localClient = new LocalClient(IP, PORT);
-//			localClient.start();
+			LocalClient localClient = new LocalClient(IP, PORT);
+			localClient.start();
 
 			Client(stage);
-		} else if (alert.getResult() == ButtonType.NO) {
-
-			int PORT = Integer.parseInt(local_PORT_Field.getText());
-
-//			CentralServer centralServer = new CentralServer(PORT);
-//			centralServer.start();
 		}
 	}
 	private Alert ShowAlertMessage(String title, String header, String context) {

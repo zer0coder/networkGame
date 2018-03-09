@@ -1,7 +1,7 @@
 package game2017.Netcode.Client;
 
-import game2017.Queues.IncomingMessageQueue;
-import game2017.Queues.OutgoingMessageQueue;
+import game2017.StorageData.Queues.IncomingMessageQueue;
+import game2017.StorageData.Queues.OutgoingMessageQueue;
 
 import java.io.BufferedReader;
 import java.io.IOException;

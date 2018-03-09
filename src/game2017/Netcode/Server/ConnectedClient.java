@@ -1,6 +1,8 @@
 package game2017.Netcode.Server;
 
 import game2017.Model.Player;
+import game2017.StorageData.Queues.IncomingMessageQueue;
+import game2017.StorageData.Queues.RelayMessageQueue;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
@@ -11,6 +13,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Author:  Francisco
@@ -21,45 +24,53 @@ import java.util.List;
 public class ConnectedClient extends Thread {
 
     private Socket socket;
+    private BufferedReader inputStream;
+    private String message;
+    private String relay;
+    private BlockingQueue<String> incomingMessages;
+    private BlockingQueue<String> relayMessages;
+
     private Player player;
     private List<Player> players = new ArrayList<Player>();
-    private  String[] board = {    // 20x20
-            "wwwwwwwwwwwwwwwwwwww",
-            "w        ww        w",
-            "w w  w  www w  w  ww",
-            "w w  w   ww w  w  ww",
-            "w  w               w",
-            "w w w w w w w  w  ww",
-            "w w     www w  w  ww",
-            "w w     w w w  w  ww",
-            "w   w w  w  w  w   w",
-            "w     w  w  w  w   w",
-            "w ww ww        w  ww",
-            "w  w w    w    w  ww",
-            "w        ww w  w  ww",
-            "w         w w  w  ww",
-            "w        w     w  ww",
-            "w  w              ww",
-            "w  w www  w w  ww ww",
-            "w w      ww w     ww",
-            "w   w   ww  w      w",
-            "wwwwwwwwwwwwwwwwwwww"
-    };
+    private String[] board;
 
-    public ConnectedClient(Socket socket) {
+    public ConnectedClient(Socket socket, String[] map) {
         this.socket = socket;
+        this.board = map;
     }
 
     @Override
     public void run() {
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            incomingMessages = IncomingMessageQueue.getIncomingMessages();
+            relayMessages = RelayMessageQueue.getRelayMessages();
 
-            System.out.println("Client: " + reader.readLine());
+            // TODO: Read User info
+            message = inputStream.readLine();
 
+            System.out.println(message);
+
+            // Read what the client is sending
+            while (message != null) {
+                message = inputStream.readLine();
+                if(message.equals("NEW_PLAYER")) {
+//                        incomingMessages.add(message);
+                    relayMessages.add(message);
+                } else {
+//                        incomingMessages.add(message);
+                    relay = "relay"; // TODO
+                    relayMessages.add(relay);
+                }
+            }
+            socket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            // We report but otherwise ignore IOExceptions
+            System.out.println("ConnectedClient error: " + e);
+            System.exit(1);
+
         }
+        System.out.println("Connection closed by client.");
     }
 
     public void playerMoved(int delta_x, int delta_y, String direction) {

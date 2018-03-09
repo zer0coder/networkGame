@@ -1,10 +1,15 @@
 package game2017.Netcode.Server;
 
+import game2017.StorageData.Maps;
+import game2017.StorageData.Queues.IncomingMessageQueue;
+import game2017.StorageData.Queues.RelayMessageQueue;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Random;
 
 /**
  * Author:  Francisco
@@ -16,16 +21,11 @@ public class CentralServer extends Thread {
 
     private int portNumber;
     private ServerSocket serverSocket;
-    private ServerData serverData;
 
-    public static void main(String[] args) {
-        CentralServer centralServer = new CentralServer(50000);
-        centralServer.start();
-    }
+    private int mapNumber;
 
     public CentralServer(int portNumber) {
         this.portNumber = portNumber;
-        serverData = new ServerData();
     }
 
     /**
@@ -92,13 +92,13 @@ public class CentralServer extends Thread {
     public void run() {
         printLocalHostAddress();
         registerOnPort();
-        serverData = new ServerData();
+        loadMaps();
 
         while (true) {
             Socket socket = waitForConnectionFromClient();
 
             if (socket != null) {
-                ConnectedClient connectedClient = new ConnectedClient(socket);
+                ConnectedClient connectedClient = new ConnectedClient(socket, Maps.getMap(mapNumber));
                 connectedClient.start();
                 System.out.println("Connection from " + socket);
 
@@ -112,4 +112,49 @@ public class CentralServer extends Thread {
         deregisterOnPort();
         System.out.println("CentralServer ended...");
     }
+
+    private void loadMaps() {
+        Random random = new Random();
+        mapNumber = random.nextInt()+ Maps.getNumberOfMaps();
+    }
+
+//    private class ClientThread extends Thread {
+//
+//        Socket socket;
+//        BufferedReader inputStream;
+//        String message;
+//        String relay;
+//
+//        ClientThread(Socket socket) {
+//            this.socket = socket;
+//        }
+//
+//        public void run() {
+//
+//            try {
+//                inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+//
+//                message = inputStream.readLine();
+//                // Read what the client is sending
+//                while (message != null) {
+//                    message = inputStream.readLine();
+//                    if(message.equals("NEW_PLAYER")) {
+////                        incomingMessages.add(message);
+//                        relayMessages.add(message);
+//                    } else {
+////                        incomingMessages.add(message);
+//                        relay = "relay"; // TODO
+//                        relayMessages.add(relay);
+//                    }
+//                }
+//                socket.close();
+//            } catch (IOException e) {
+//                // We report but otherwise ignore IOExceptions
+//                System.out.println("ClientThread error: " + e);
+//                System.exit(1);
+//
+//            }
+//            System.out.println("Connection closed by client.");
+//        }
+//    }
 }
