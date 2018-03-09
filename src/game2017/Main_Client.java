@@ -1,5 +1,7 @@
 package game2017;
 
+import game2017.Model.MType;
+import game2017.Model.Message;
 import game2017.Model.Player;
 import game2017.Netcode.Client.LocalClient;
 import game2017.StorageData.Queues.OutgoingMessageQueue;
@@ -16,9 +18,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
@@ -32,14 +31,7 @@ public class Main_Client extends Application {
 	private static Image image_wall;
 	private static Image hero_right,hero_left,hero_up,hero_down;
 
-	private static Player me;
-
-	public static HashMap<String, Player> getPlayers() {
-		return players;
-	}
-
-	//	private static List<Player> players = new ArrayList<Player>();
-	private static HashMap<String, Player> players = new HashMap<>();
+//	private static Player player;
 
 	private Label[][] fields;
 	private TextArea scoreList;
@@ -135,85 +127,68 @@ public class Main_Client extends Application {
 
 			scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
 				switch (event.getCode()) {
-					case UP:    AddToOutgoingQueue(username + "," + 0 + "," + (-1) + "," + "up");    break;
-					case DOWN:  AddToOutgoingQueue(username + "," + 0 + "," + (+1) + "," + "down");    break;
-					case LEFT:  AddToOutgoingQueue(username + "," + (-1) + "," + (0) + "," + "left");    break;
-					case RIGHT: AddToOutgoingQueue(username + "," + (+1) + "," + (0) + "," + "right");    break;
+					case UP:    SendMoveRequest(0,-1, "up");    break;
+					case DOWN:  SendMoveRequest(0,+1, "down");    break;
+					case LEFT:  SendMoveRequest(-1,0, "left");    break;
+					case RIGHT: SendMoveRequest(+1,0, "right");    break;
 					default: break;
 				}
 			});
 
-			scoreList.setText(getScoreList());
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void CreatePlayer(String name, int startX, int startY) {
-		Player player = new Player(name,startX,startY,"up");
-		players.put(name, player);
+	private BlockingQueue<Message> outgoing = OutgoingMessageQueue.getOutgoingMessages();
+
+	public void SendNewPlayerData(String user) {
+		Message message = new Message(user);
+		message.setType(MType.DATA);
+		outgoing.add(message);
+	}
+
+	public void SendMoveRequest(int x, int y, String direction) {
+		Message message = new Message(username);
+		message.setXpos(x);
+		message.setYpos(y);
+		message.setDirection(direction);
+		message.setType(MType.MOVE);
+		outgoing.add(message);
+	}
+
+	public void CreatePlayer(int startX, int startY) {
 		fields[startX][startY].setGraphic(new ImageView(hero_up));
-		scoreList.setText(getScoreList());
 	}
 
-	public void playerMoved(String name, int delta_x, int delta_y, String direction) {
-		me = players.get(name);
-		me.setDirection(direction);
-		int x = me.getXpos(),y = me.getYpos();
+	public void playerMoved(Player player, String direction) {
+		player.setDirection(direction);
+		int x = player.getXpos(),y = player.getYpos();
+		int prev_x = player.getPrev_xpos(), prev_y = player.getPrev_ypos();
 
-//		AddToOutgoingQueue(x + "," + y + "," + direction);
+		fields[prev_x][prev_y].setGraphic(new ImageView(image_floor));
+//		x+=delta_x;
+//		y+=delta_y;
 
-		if (board[y+delta_y].charAt(x+delta_x)=='w') {
-			me.addPoints(-1);
-		} 
-		else {
-			Player p = getPlayerAt(x+delta_x,y+delta_y);
-			if (p!=null) {
-              me.addPoints(10);
-              p.addPoints(-10);
-			} else {
-				me.addPoints(1);
-			
-				fields[x][y].setGraphic(new ImageView(image_floor));
-				x+=delta_x;
-				y+=delta_y;
+		if (direction.equals("right")) {
+			fields[x][y].setGraphic(new ImageView(hero_right));
+		};
+		if (direction.equals("left")) {
+			fields[x][y].setGraphic(new ImageView(hero_left));
+		};
+		if (direction.equals("up")) {
+			fields[x][y].setGraphic(new ImageView(hero_up));
+		};
+		if (direction.equals("down")) {
+			fields[x][y].setGraphic(new ImageView(hero_down));
+		};
 
-				if (direction.equals("right")) {
-					fields[x][y].setGraphic(new ImageView(hero_right));
-				};
-				if (direction.equals("left")) {
-					fields[x][y].setGraphic(new ImageView(hero_left));
-				};
-				if (direction.equals("up")) {
-					fields[x][y].setGraphic(new ImageView(hero_up));
-				};
-				if (direction.equals("down")) {
-					fields[x][y].setGraphic(new ImageView(hero_down));
-				};
-
-				me.setXpos(x);
-				me.setYpos(y);
-			}
-		}
-		scoreList.setText(getScoreList());
+		player.setXpos(x);
+		player.setYpos(y);
 	}
 
-	public String getScoreList() {
-		StringBuffer b = new StringBuffer(100);
-		for (Map.Entry<String,Player> p : players.entrySet()) {
-			b.append(p.getValue()+"\r\n");
-		}
-		return b.toString();
-	}
-
-	public Player getPlayerAt(int x, int y) {
-		for (Map.Entry<String,Player> pa : players.entrySet()) {
-			Player p = pa.getValue();
-			if (p.getXpos()==x && p.getYpos()==y) {
-				return p;
-			}
-		}
-		return null;
+	public void setScoreList(String score) {
+		scoreList.setText(score);
 	}
 
 	private void CreateClientToServerConnection(Stage stage) {
@@ -224,7 +199,7 @@ public class Main_Client extends Application {
 		pane.setMaxWidth(Double.MAX_VALUE);
 		pane.setHgap(10);
 		pane.setVgap(10);
-		TextField local_IP_Field = new TextField("192.168.1.143");
+		TextField local_IP_Field = new TextField("192.168.0.13");
 		TextField local_PORT_Field = new TextField("50000");
 		TextField local_USER_field = new TextField("User 1");
 
@@ -252,7 +227,7 @@ public class Main_Client extends Application {
 			localClient.start();
 
 			Client(stage);
-			AddToOutgoingQueue("NAME," + username);
+			SendNewPlayerData(username);
 		}
 	}
 	private Alert ShowAlertMessage(String title, String header, String context) {
@@ -266,13 +241,72 @@ public class Main_Client extends Application {
 		return alert;
 	}
 
-	private BlockingQueue<String> outgoing = OutgoingMessageQueue.getOutgoingMessages();
-	public void AddToOutgoingQueue(String command) {
-		outgoing.add(command);
-	}
 
 	public static void main(String[] args) {
 		launch(args);
 	}
+
+	//	public void CreatePlayer(String name, int startX, int startY) {
+//		Player player = new Player(name,startX,startY,"up");
+//		players.put(name, player);
+//		fields[startX][startY].setGraphic(new ImageView(hero_up));
+//		scoreList.setText(getScoreList());
+//	}
+
+//	public void playerMoved(Player player, int delta_x, int delta_y, String direction) {
+//		player.setDirection(direction);
+//		int x = player.getXpos(),y = player.getYpos();
+//
+//		if (board[y+delta_y].charAt(x+delta_x)=='w') {
+//			player.addPoints(-1);
+//		}
+//		else {
+//			Player p = getPlayerAt(x+delta_x,y+delta_y);
+//			if (p!=null) {
+//              player.addPoints(10);
+//              p.addPoints(-10);
+//			} else {
+//				player.addPoints(1);
+//
+//				fields[x][y].setGraphic(new ImageView(image_floor));
+//				x+=delta_x;
+//				y+=delta_y;
+//
+//				if (direction.equals("right")) {
+//					fields[x][y].setGraphic(new ImageView(hero_right));
+//				};
+//				if (direction.equals("left")) {
+//					fields[x][y].setGraphic(new ImageView(hero_left));
+//				};
+//				if (direction.equals("up")) {
+//					fields[x][y].setGraphic(new ImageView(hero_up));
+//				};
+//				if (direction.equals("down")) {
+//					fields[x][y].setGraphic(new ImageView(hero_down));
+//				};
+//
+//				player.setXpos(x);
+//				player.setYpos(y);
+//			}
+//		}
+//		scoreList.setText(getScoreList());
+//	}
+//
+//	public String getScoreList() {
+//		StringBuffer b = new StringBuffer(100);
+//		for (Player p : players) {
+//			b.append(p.getValue()+"\r\n");
+//		}
+//		return b.toString();
+//	}
+//
+//	public Player getPlayerAt(int x, int y) {
+//		for (Player p : players) {
+//			if (p.getXpos()==x && p.getYpos()==y) {
+//				return p;
+//			}
+//		}
+//		return null;
+//	}
 }
 

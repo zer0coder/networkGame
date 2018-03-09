@@ -1,5 +1,6 @@
 package game2017.Netcode.Server;
 
+import game2017.Model.Message;
 import game2017.StorageData.Maps;
 import game2017.StorageData.Queues.RelayMessageQueue;
 
@@ -91,7 +92,7 @@ public class CentralServer extends Thread {
     }
 
     private void initializeRelayDirector() {
-        MessageHandler relayDirector = new MessageHandler();
+        MessageHandler relayDirector = new MessageHandler(mapNumber);
         relayDirector.start();
     }
 
@@ -102,7 +103,7 @@ public class CentralServer extends Thread {
         initializeRelayDirector();
 
 
-        BlockingQueue<String> relayQueue;
+        BlockingQueue<Message> relayQueue;
 
         while (true) {
             Socket socket = waitForConnectionFromClient();
@@ -110,7 +111,7 @@ public class CentralServer extends Thread {
             RelayMessageQueue.AddRelayQueue(relayQueue);
 
             if (socket != null) {
-                ConnectedClient connectedClient = new ConnectedClient(socket, Maps.getMap(mapNumber));
+                ConnectedClient connectedClient = new ConnectedClient(socket);
                 MessageRelay relay = new MessageRelay(socket, relayQueue);
                 connectedClient.start();
                 relay.start();

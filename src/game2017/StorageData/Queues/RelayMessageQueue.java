@@ -1,5 +1,7 @@
 package game2017.StorageData.Queues;
 
+import game2017.Model.Message;
+
 import java.util.HashSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -13,8 +15,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class RelayMessageQueue {
 
     private static volatile RelayMessageQueue relayMessageQueue;
-    private static BlockingQueue<String> relayMessages = new LinkedBlockingQueue<>();
-    private static HashSet<BlockingQueue<String>> relayQueue = new HashSet<>();
+    private static BlockingQueue<Message> relayMessages = new LinkedBlockingQueue<>();
+    private static HashSet<BlockingQueue<Message>> relayQueue = new HashSet<>();
 
     private RelayMessageQueue() {
         if (relayMessageQueue != null) {
@@ -33,19 +35,19 @@ public class RelayMessageQueue {
         return relayMessageQueue;
     }
 
-    public static BlockingQueue<String> getRelayMessages() {
+    public static BlockingQueue<Message> getRelayMessages() {
         return relayMessages;
     }
 
-    public static HashSet<BlockingQueue<String>> getRelayQueue() {
+    public static HashSet<BlockingQueue<Message>> getRelayQueue() {
         return relayQueue;
     }
 
-    public static void AddRelayQueue(BlockingQueue<String> queue) {
+    public static void AddRelayQueue(BlockingQueue<Message> queue) {
         relayQueue.add(queue);
     }
 
-    public static void RemoveRelayQueue(BlockingQueue<String> queue) {
+    public static void RemoveRelayQueue(BlockingQueue<Message> queue) {
         relayQueue.remove(queue);
     }
 }
