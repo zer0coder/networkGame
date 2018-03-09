@@ -38,6 +38,7 @@ public class MessageRelay extends Thread {
                 System.out.println("MessageRelay: \n" + message.toString());
                 outputstream.writeObject(message);
                 outputstream.flush();
+                outputstream.reset();
             }
             socket.close();
 

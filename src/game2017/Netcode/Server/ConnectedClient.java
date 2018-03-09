@@ -36,9 +36,11 @@ public class ConnectedClient extends Thread {
             BlockingQueue<Message> relayMessages = RelayMessageQueue.getRelayMessages();
 
             Message message;
-            while (!(message = (Message) inputStream.readObject()).getType().equals(MType.DISCONNECT)) {
+            while (inputStream.available() == 0) {
+                message = (Message) inputStream.readObject();
                 relayMessages.add(message);
             }
+
             socket.close();
 
         } catch (IOException e) {

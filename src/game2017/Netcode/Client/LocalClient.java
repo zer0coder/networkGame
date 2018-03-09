@@ -84,7 +84,7 @@ public class LocalClient extends Thread {
                 outputStream = new ObjectOutputStream(socket.getOutputStream());
 
                 while(!(message = outgoingMessages.take()).getType().equals(MType.DISCONNECT)) {
-                    outputStream.writeObject(message);
+                    outputStream.writeUnshared(message);
                     outputStream.flush();
                 }
 
@@ -114,12 +114,15 @@ public class LocalClient extends Thread {
         }
 
         public void run() {
-            System.out.println("Local client - reciever running...");
+            System.out.println("Reciever running...");
             try {
                 inputStream = new ObjectInputStream(socket.getInputStream());
 
-                while(!(message = (Message) inputStream.readObject()).getType().equals(MType.DISCONNECT)) {
-                    System.out.println("LocalClient: \n" + message.toString());
+                while(inputStream.available() == 0) {
+
+                    message = (Message) inputStream.readObject();
+
+                    System.out.println("Reciever: \n" + message.toString());
                     if(message.getType().equals(MType.MOVE)) {
                         Platform.runLater(() -> {
                             for(Map.Entry<String, Player> p : message.getPlayers().entrySet()) {
@@ -140,7 +143,7 @@ public class LocalClient extends Thread {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            System.out.println("Local client - reciever dead...");
+            System.out.println("Reciever dead...");
         }
     }
 }
