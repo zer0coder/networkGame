@@ -2,6 +2,7 @@ package game2017;
 
 import game2017.Model.Player;
 import game2017.Netcode.Client.LocalClient;
+import game2017.StorageData.Queues.OutgoingMessageQueue;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -17,6 +18,7 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 public class Main_Client extends Application {
 
@@ -152,6 +154,8 @@ public class Main_Client extends Application {
 		me.setDirection(direction);
 		int x = me.getXpos(),y = me.getYpos();
 
+		AddToOutgoingQueue("X: " + x + ", Y: " + y + ", DIR: " + direction);
+
 		if (board[y+delta_y].charAt(x+delta_x)=='w') {
 			me.addPoints(-1);
 		} 
@@ -212,8 +216,8 @@ public class Main_Client extends Application {
 		pane.setMaxWidth(Double.MAX_VALUE);
 		pane.setHgap(10);
 		pane.setVgap(10);
-		TextField local_IP_Field = new TextField("192.168.0.13");
-		TextField local_PORT_Field = new TextField("50003");
+		TextField local_IP_Field = new TextField("192.168.1.143");
+		TextField local_PORT_Field = new TextField("50000");
 		TextField local_USER_field = new TextField("User 1");
 
 		local_IP_Field.setMaxWidth(Double.MAX_VALUE);
@@ -250,6 +254,11 @@ public class Main_Client extends Application {
 		alert.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
 
 		return alert;
+	}
+
+	private BlockingQueue<String> outgoing = OutgoingMessageQueue.getOutgoingMessages();
+	private void AddToOutgoingQueue(String command) {
+		outgoing.add(command);
 	}
 
 	public static void main(String[] args) {

@@ -54,6 +54,7 @@ public class ConnectedClient extends Thread {
             // Read what the client is sending
             while (message != null) {
                 message = inputStream.readLine();
+                System.out.println(message);
                 if(message.equals("NEW_PLAYER")) {
 //                        incomingMessages.add(message);
                     relayMessages.add(message);

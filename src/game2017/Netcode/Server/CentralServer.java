@@ -114,8 +114,11 @@ public class CentralServer extends Thread {
     }
 
     private void loadMaps() {
+        Maps maps = new Maps();
         Random random = new Random();
-        mapNumber = random.nextInt()+ Maps.getNumberOfMaps();
+//        mapNumber = random.nextInt(maps.getNumberOfMaps());
+        mapNumber = 0;
+        System.out.println("Map: " + mapNumber);
     }
 
 //    private class ClientThread extends Thread {

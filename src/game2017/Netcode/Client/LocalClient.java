@@ -80,7 +80,6 @@ public class LocalClient extends Thread {
 
                 outputStream = new PrintWriter(socket.getOutputStream());
 
-
                 while((message = outgoingMessages.take()) != null) {
                     outputStream.println(message);
                     outputStream.flush();
@@ -113,9 +112,11 @@ public class LocalClient extends Thread {
                 String message;
 
                 message = inputStream.readLine();
+                System.out.println(message);
                 while(message != null) {
                     message = inputStream.readLine();
                     incomingMessages.add(message);
+                    System.out.println(message);
                 }
 
             } catch (IOException e) {
