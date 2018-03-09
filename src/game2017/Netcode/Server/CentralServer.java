@@ -12,15 +12,15 @@ import java.net.UnknownHostException;
  * Date:    05-03-2018
  * Time:    10:43
  */
-public class CentralServer {
+public class CentralServer extends Thread {
 
-    private int portNumber = 50000;
+    private int portNumber;
     private ServerSocket serverSocket;
     private ServerData serverData;
 
-    public static void main(String[] args) {
-        CentralServer server = new CentralServer();
-        server.run();
+    public CentralServer(int portNumber) {
+        this.portNumber = portNumber;
+        serverData = new ServerData();
     }
 
     /**
@@ -84,7 +84,7 @@ public class CentralServer {
         return res;
     }
 
-    private void run() {
+    public void run() {
         printLocalHostAddress();
         registerOnPort();
         serverData = new ServerData();
@@ -105,5 +105,6 @@ public class CentralServer {
         }
 
         deregisterOnPort();
+        System.out.println("CentralServer ended...");
     }
 }
