@@ -9,7 +9,6 @@ import java.util.concurrent.BlockingQueue;
  * Author:  fgluv
  * Project: EAAA_DIS_DIP
  * Package: Netcode
- * Date:    19-01-2018
  */
 public class RelayDirector extends Thread {
 
