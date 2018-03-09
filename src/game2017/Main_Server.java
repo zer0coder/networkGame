@@ -16,7 +16,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.*;
 
-public class Main extends Application {
+public class Main_Server extends Application {
 
 	private static final int size = 20;
 	private static final int scene_height = size * 20 + 100;
@@ -65,7 +65,14 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
-		ClientOrServer(primaryStage);
+
+		TextField local_IP_Field = new TextField("192.168.0.13");
+		TextField local_PORT_Field = new TextField("50003");
+
+
+//		ClientOrServer(primaryStage);
+ 		CentralServer centralServer = new CentralServer(Integer.parseInt(local_PORT_Field.getText()));
+  	    centralServer.start();
 	}
 
 	private void Client(Stage primaryStage) {
