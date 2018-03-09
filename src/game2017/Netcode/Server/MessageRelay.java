@@ -1,6 +1,10 @@
 package game2017.Netcode.Server;
 
+import game2017.Model.MType;
+import game2017.Model.Message;
+
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
@@ -15,28 +19,28 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class MessageRelay extends Thread {
 
     private Socket socket;
-    private BlockingQueue<String> relayMessages;
+    private BlockingQueue<Message> relayMessages;
 
-    public MessageRelay(Socket socket, BlockingQueue<String> queue) {
+    public MessageRelay(Socket socket, BlockingQueue<Message> queue) {
         this.socket = socket;
         this.relayMessages = queue;
     }
 
     @Override
     public void run() {
-        PrintWriter outputstream;
-        String message;
+        ObjectOutputStream outputstream;
+        Message message;
 
         try {
-            outputstream = new PrintWriter(socket.getOutputStream());
+            outputstream = new ObjectOutputStream(socket.getOutputStream());
 
-            // Read what the client is sending
-            while ((message = relayMessages.take()) != null) {
-                outputstream.println(message);
-                outputstream.flush();
-//                System.out.println("relayed... " + message);
+
+            while (!(message = relayMessages.take()).getType().equals(MType.DISCONNECT)) {
+                outputstream.writeObject(message);
             }
             socket.close();
+
+
         } catch (IOException e) {
             // We report but otherwise ignore IOExceptions
             System.out.println("ConnectedClient error: " + e);

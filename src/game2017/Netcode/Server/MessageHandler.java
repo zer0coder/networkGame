@@ -1,5 +1,7 @@
 package game2017.Netcode.Server;
 
+import game2017.Model.MType;
+import game2017.Model.Message;
 import game2017.StorageData.Queues.RelayMessageQueue;
 
 import java.util.HashSet;
@@ -13,8 +15,8 @@ import java.util.concurrent.BlockingQueue;
  */
 public class MessageHandler extends Thread {
 
-    private BlockingQueue<String> relayMessages;
-    private HashSet<BlockingQueue<String>> relayQueues;
+    private BlockingQueue<Message> relayMessages;
+    private HashSet<BlockingQueue<Message>> relayQueues;
 
     public MessageHandler() {
         relayMessages = RelayMessageQueue.getRelayMessages();
@@ -22,13 +24,14 @@ public class MessageHandler extends Thread {
     }
 
     public void run() {
-        String message;
+        Message message;
 
         try {
 
-            while((message = relayMessages.take()) != null) {
-                for(BlockingQueue<String> queue : relayQueues)
+            while(!(message = relayMessages.take()).getType().equals(MType.DISCONNECT)) {
+                for(BlockingQueue<Message> queue : relayQueues) {
                     queue.add(message);
+                }
             }
 
         } catch (InterruptedException e) {

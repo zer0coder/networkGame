@@ -1,5 +1,7 @@
 package game2017.Netcode.Server;
 
+import game2017.Model.MType;
+import game2017.Model.Message;
 import game2017.Model.Player;
 import game2017.StorageData.Queues.IncomingMessageQueue;
 import game2017.StorageData.Queues.RelayMessageQueue;
@@ -7,6 +9,7 @@ import game2017.StorageData.Queues.RelayMessageQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,76 +24,33 @@ import java.util.concurrent.BlockingQueue;
 public class ConnectedClient extends Thread {
 
     private Socket socket;
-    private BufferedReader inputStream;
-    private String message;
-    private BlockingQueue<String> incomingMessages;
-    private BlockingQueue<String> relayMessages;
-    private Player player;
-    private List<Player> players = new ArrayList<Player>();
-    private String[] board;
 
-    public ConnectedClient(Socket socket, String[] map) {
+    public ConnectedClient(Socket socket) {
         this.socket = socket;
-        this.board = map;
     }
 
     @Override
     public void run() {
         try {
-            inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            incomingMessages = IncomingMessageQueue.getIncomingMessages();
-            relayMessages = RelayMessageQueue.getRelayMessages();
+            ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+            BlockingQueue<Message> incomingMessages = IncomingMessageQueue.getIncomingMessages();
+            BlockingQueue<Message> relayMessages = RelayMessageQueue.getRelayMessages();
 
-            // TODO: Read User info
-//            message = inputStream.readLine();
-
-            // Read what the client is sending
-            while ((message = inputStream.readLine()) != null) {
-//                System.out.println(message);
+            Message message;
+            while (!(message = (Message) inputStream.readObject()).getType().equals(MType.DISCONNECT)) {
                 incomingMessages.add(message);
                 relayMessages.add(message);
             }
             socket.close();
+
         } catch (IOException e) {
             // We report but otherwise ignore IOExceptions
             System.out.println("ConnectedClient error: " + e);
             System.exit(1);
 
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
         System.out.println("Connection closed by client.");
-    }
-
-    public void playerMoved(int delta_x, int delta_y, String direction) {
-        player.setDirection(direction);
-        int x = player.getXpos(),y = player.getYpos();
-
-        if (board[y+delta_y].charAt(x+delta_x)=='w') {
-            player.addPoints(-1);
-        }
-        else {
-            Player p = getPlayerAt(x+delta_x,y+delta_y);
-            if (p!=null) {
-                player.addPoints(10);
-                p.addPoints(-10);
-            } else {
-                player.addPoints(1);
-
-                x+=delta_x;
-                y+=delta_y;
-
-
-                player.setXpos(x);
-                player.setYpos(y);
-            }
-        }
-    }
-
-    public Player getPlayerAt(int x, int y) {
-        for (Player p : players) {
-            if (p.getXpos()==x && p.getYpos()==y) {
-                return p;
-            }
-        }
-        return null;
     }
 }

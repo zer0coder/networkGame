@@ -1,5 +1,7 @@
 package game2017.StorageData.Queues;
 
+import game2017.Model.Message;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -12,7 +14,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class IncomingMessageQueue {
 
     private static volatile IncomingMessageQueue incomingMessageQueue;
-    private static BlockingQueue<String> incomingMessages = new LinkedBlockingQueue<>();
+    private static BlockingQueue<Message> incomingMessages = new LinkedBlockingQueue<>();
 
     private IncomingMessageQueue() {
         if (incomingMessageQueue != null) {
@@ -31,7 +33,7 @@ public class IncomingMessageQueue {
         return incomingMessageQueue;
     }
 
-    public static BlockingQueue<String> getIncomingMessages() {
+    public static BlockingQueue<Message> getIncomingMessages() {
         return incomingMessages;
     }
 }

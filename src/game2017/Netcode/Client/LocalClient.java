@@ -1,15 +1,14 @@
 package game2017.Netcode.Client;
 
 import game2017.Main_Client;
+import game2017.Model.MType;
+import game2017.Model.Message;
 import game2017.Model.Player;
 import game2017.StorageData.Queues.IncomingMessageQueue;
 import game2017.StorageData.Queues.OutgoingMessageQueue;
 import javafx.application.Platform;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -26,8 +25,7 @@ public class LocalClient extends Thread {
 
     private int portNumber;
     private String serverName;
-    private BlockingQueue<String> outgoingMessages;
-    private BlockingQueue<String> incomingMessages;
+    private BlockingQueue<Message> outgoingMessages;
     private Main_Client client;
 
     public LocalClient(String IP, int portNumber, Main_Client client) {
@@ -72,9 +70,8 @@ public class LocalClient extends Thread {
         Socket socket = connectToServer();
 
         outgoingMessages = OutgoingMessageQueue.getOutgoingMessages();
-        incomingMessages = IncomingMessageQueue.getIncomingMessages();
-        PrintWriter outputStream;
-        String message;
+        ObjectOutputStream outputStream;
+        Message message;
 
         if (socket != null) {
             System.out.println("Connected to " + socket);
@@ -84,17 +81,18 @@ public class LocalClient extends Thread {
 
             try {
 
-                outputStream = new PrintWriter(socket.getOutputStream());
+                outputStream = new ObjectOutputStream(socket.getOutputStream());
 
-                while((message = outgoingMessages.take()) != null) {
-                    outputStream.println(message);
+                while(!(message = outgoingMessages.take()).getType().equals(MType.DISCONNECT)) {
+                    outputStream.writeObject(message);
                     outputStream.flush();
                 }
 
                 socket.close();
 
             } catch (IOException e) {
-                System.out.println("Local client error: " + e.getMessage());
+//                System.out.println("Local client error: \n" + e.getMessage());
+                e.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -106,7 +104,7 @@ public class LocalClient extends Thread {
     private class Reciever extends Thread {
 
         Socket socket;
-        BufferedReader inputStream;
+        ObjectInputStream inputStream;
         Main_Client client;
 
         Reciever(Socket socket, Main_Client client) {
@@ -117,22 +115,18 @@ public class LocalClient extends Thread {
         public void run() {
             System.out.println("Local client - reciever running...");
             try {
-                inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                String message;
+                inputStream = new ObjectInputStream(socket.getInputStream());
+                Message message;
 
-                while((message = inputStream.readLine()) != null) {
-//                    incomingMessages.add(message);
-//                    System.out.println(message);
-                    String[] command = message.split(",");
-                    if(command[0].equals("NAME")) {
-                        Platform.runLater(() -> client.CreatePlayer(command[1], Integer.parseInt(command[2]), Integer.parseInt(command[3])));
-                    } else {
-                        Platform.runLater(() -> client.playerMoved(command[0], Integer.parseInt(command[1]), Integer.parseInt(command[2]), command[3]));
-                    }
+                while(!(message = outgoingMessages.take()).getType().equals(MType.DISCONNECT)) {
+                    System.out.println(message);
+//                    Platform.runLater(() -> client.playerMoved(command[0], Integer.parseInt(command[1]), Integer.parseInt(command[2]), command[3]));
                 }
 
             } catch (IOException e) {
                 System.out.println("Reciever error: " + e.getMessage());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             System.out.println("Local client - reciever dead...");
         }
