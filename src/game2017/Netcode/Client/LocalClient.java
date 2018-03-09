@@ -130,7 +130,7 @@ public class LocalClient extends Thread {
                         });
                     } else if (message.getType().equals(MType.DATA)) {
                         Platform.runLater(() -> {
-                            client.CreatePlayer(message.getXpos(), message.getYpos());
+                            client.CreatePlayer(message.getPlayer().getXpos(), message.getPlayer().getYpos());
                         });
                     }
                 }

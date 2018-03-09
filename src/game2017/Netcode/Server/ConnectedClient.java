@@ -37,7 +37,6 @@ public class ConnectedClient extends Thread {
 
             Message message;
             while (!(message = (Message) inputStream.readObject()).getType().equals(MType.DISCONNECT)) {
-                System.out.println("ConnectedClient: \n" + message.toString());
                 relayMessages.add(message);
             }
             socket.close();

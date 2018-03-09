@@ -34,17 +34,15 @@ public class MessageHandler extends Thread {
         try {
             Message relayMessage;
             while(!(message = relayMessages.take()).getType().equals(MType.DISCONNECT)) {
-                System.out.println("MessageHandler: \n" + message.toString());
                 relayMessage = new Message("SERVER");
 
                 MType type = message.getType();
 
                 if(type.equals(MType.DATA)) {
-                    CreatePlayer(message.getUsername(), 2, 2);
-                    relayMessage.setXpos(2);
-                    relayMessage.setYpos(2);
+                    Player player = CreatePlayer(message.getUsername(), 2, 2);
                     relayMessage.setPlayers(players);
                     relayMessage.setScoreList(getScoreList());
+                    relayMessage.setPlayer(player);
                 } else if (type.equals(MType.MOVE)) {
                     Player player = players.get(message.getUsername());
 
@@ -76,11 +74,12 @@ public class MessageHandler extends Thread {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void CreatePlayer(String name, int startX, int startY) {
+    public Player CreatePlayer(String name, int startX, int startY) {
 		Player player = new Player(name,startX,startY,"up");
 		player.setPrev_xpos(startX);
 		player.setPrev_ypos(startY);
 		players.put(name, player);
+		return player;
 	}
 
     public void playerMoved(Player player, int delta_x, int delta_y, String direction) {

@@ -1,7 +1,6 @@
 package game2017.Model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -12,7 +11,7 @@ import java.util.HashMap;
  */
 public class Message implements Serializable {
 
-    private HashMap<String, Player> players = new HashMap<>();
+    private HashMap<String, Player> players;
     private Player player;
     private String scoreList;
     private String username;

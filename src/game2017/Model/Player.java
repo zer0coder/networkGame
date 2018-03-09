@@ -3,12 +3,12 @@ package game2017.Model;
 import java.io.Serializable;
 
 public class Player implements Serializable {
-	private String name;
-	private int xpos;
-	private int ypos;
-	private int point;
-	private String direction;
-	private boolean alive = true;
+	String name;
+	int xpos;
+	int ypos;
+	int point;
+	String direction;
+	boolean alive = true;
 
 	private int prev_xpos;
 	private int prev_ypos;
