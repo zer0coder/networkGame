@@ -33,12 +33,11 @@ public class ConnectedClient extends Thread {
     public void run() {
         try {
             ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-            BlockingQueue<Message> incomingMessages = IncomingMessageQueue.getIncomingMessages();
             BlockingQueue<Message> relayMessages = RelayMessageQueue.getRelayMessages();
 
             Message message;
             while (!(message = (Message) inputStream.readObject()).getType().equals(MType.DISCONNECT)) {
-                incomingMessages.add(message);
+                System.out.println("ConnectedClient: \n" + message.toString());
                 relayMessages.add(message);
             }
             socket.close();

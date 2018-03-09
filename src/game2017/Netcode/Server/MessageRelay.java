@@ -34,9 +34,10 @@ public class MessageRelay extends Thread {
         try {
             outputstream = new ObjectOutputStream(socket.getOutputStream());
 
-
             while (!(message = relayMessages.take()).getType().equals(MType.DISCONNECT)) {
+                System.out.println("MessageRelay: \n" + message.toString());
                 outputstream.writeObject(message);
+                outputstream.flush();
             }
             socket.close();
 

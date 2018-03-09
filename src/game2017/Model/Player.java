@@ -10,6 +10,9 @@ public class Player implements Serializable {
 	private String direction;
 	private boolean alive = true;
 
+	private int prev_xpos;
+	private int prev_ypos;
+
 	public Player(String name, int xpos, int ypos, String direction) {
 		this.name = name;
 		this.xpos = xpos;
@@ -40,7 +43,7 @@ public class Player implements Serializable {
 		point+=p;
 	}
 	public String toString() {
-		return name+":   "+point;
+		return name+":   "+point + ", x: " + xpos + ", y: " + ypos;
 	}
 
 	public boolean isAlive() {
@@ -49,5 +52,21 @@ public class Player implements Serializable {
 
 	public void setAlive(boolean alive) {
 		this.alive = alive;
+	}
+
+	public int getPrev_xpos() {
+		return prev_xpos;
+	}
+
+	public void setPrev_xpos(int prev_xpos) {
+		this.prev_xpos = prev_xpos;
+	}
+
+	public int getPrev_ypos() {
+		return prev_ypos;
+	}
+
+	public void setPrev_ypos(int prev_ypos) {
+		this.prev_ypos = prev_ypos;
 	}
 }

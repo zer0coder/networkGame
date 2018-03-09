@@ -2,7 +2,7 @@ package game2017.Model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 /**
  * Author:  fgluv
@@ -12,23 +12,25 @@ import java.util.List;
  */
 public class Message implements Serializable {
 
-    private List<Player> players = new ArrayList<Player>();
+    private HashMap<String, Player> players = new HashMap<>();
+    private Player player;
     private String scoreList;
     private String username;
     private MType type;
     private int xpos;
     private int ypos;
     private int point;
+    private String direction;
 
     public Message(String username) {
         this.username = username;
     }
 
-    public List<Player> getPlayers() {
+    public HashMap<String, Player> getPlayers() {
         return players;
     }
 
-    public void setPlayers(List<Player> players) {
+    public void setPlayers(HashMap<String, Player> players) {
         this.players = players;
     }
 
@@ -50,11 +52,6 @@ public class Message implements Serializable {
 
     public String getUsername() {
         return username;
-    }
-
-    @Override
-    public String toString() {
-        return username + ": " + type;
     }
 
     public int getXpos() {
@@ -79,5 +76,26 @@ public class Message implements Serializable {
 
     public void setPoint(int point) {
         this.point = point;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
+
+    @Override
+    public String toString() {
+        return username + ": " + type + "\n" + players.toString() + "\n";
     }
 }

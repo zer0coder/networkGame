@@ -103,9 +103,10 @@ public class LocalClient extends Thread {
 
     private class Reciever extends Thread {
 
-        Socket socket;
-        ObjectInputStream inputStream;
-        Main_Client client;
+        private Socket socket;
+        private ObjectInputStream inputStream;
+        private Main_Client client;
+        private Message message;
 
         Reciever(Socket socket, Main_Client client) {
             this.socket = socket;
@@ -116,16 +117,27 @@ public class LocalClient extends Thread {
             System.out.println("Local client - reciever running...");
             try {
                 inputStream = new ObjectInputStream(socket.getInputStream());
-                Message message;
 
-                while(!(message = outgoingMessages.take()).getType().equals(MType.DISCONNECT)) {
-                    System.out.println(message);
-//                    Platform.runLater(() -> client.playerMoved(command[0], Integer.parseInt(command[1]), Integer.parseInt(command[2]), command[3]));
+                while(!(message = (Message) inputStream.readObject()).getType().equals(MType.DISCONNECT)) {
+                    System.out.println("LocalClient: \n" + message.toString());
+                    if(message.getType().equals(MType.MOVE)) {
+                        Platform.runLater(() -> {
+                            for(Map.Entry<String, Player> p : message.getPlayers().entrySet()) {
+                                Player pa = p.getValue();
+                                client.playerMoved(pa, pa.getDirection());
+                            }
+                            client.setScoreList(message.getScoreList());
+                        });
+                    } else if (message.getType().equals(MType.DATA)) {
+                        Platform.runLater(() -> {
+                            client.CreatePlayer(message.getXpos(), message.getYpos());
+                        });
+                    }
                 }
 
             } catch (IOException e) {
                 System.out.println("Reciever error: " + e.getMessage());
-            } catch (InterruptedException e) {
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
             System.out.println("Local client - reciever dead...");

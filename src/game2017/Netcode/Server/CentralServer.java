@@ -92,7 +92,7 @@ public class CentralServer extends Thread {
     }
 
     private void initializeRelayDirector() {
-        MessageHandler relayDirector = new MessageHandler();
+        MessageHandler relayDirector = new MessageHandler(mapNumber);
         relayDirector.start();
     }
 

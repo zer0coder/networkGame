@@ -31,7 +31,7 @@ public class Main_Client extends Application {
 	private static Image image_wall;
 	private static Image hero_right,hero_left,hero_up,hero_down;
 
-	private static Player player;
+//	private static Player player;
 
 	private Label[][] fields;
 	private TextArea scoreList;
@@ -127,21 +127,126 @@ public class Main_Client extends Application {
 
 			scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
 				switch (event.getCode()) {
-					case UP:    SendMoveRequest(0,-1);    break;
-					case DOWN:  SendMoveRequest(0,+1);    break;
-					case LEFT:  SendMoveRequest(-1,0);    break;
-					case RIGHT: SendMoveRequest(+1,0);    break;
+					case UP:    SendMoveRequest(0,-1, "up");    break;
+					case DOWN:  SendMoveRequest(0,+1, "down");    break;
+					case LEFT:  SendMoveRequest(-1,0, "left");    break;
+					case RIGHT: SendMoveRequest(+1,0, "right");    break;
 					default: break;
 				}
 			});
 
-//			scoreList.setText(getScoreList());
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-//	public void CreatePlayer(String name, int startX, int startY) {
+	private BlockingQueue<Message> outgoing = OutgoingMessageQueue.getOutgoingMessages();
+
+	public void SendNewPlayerData(String user) {
+		Message message = new Message(user);
+		message.setType(MType.DATA);
+		outgoing.add(message);
+	}
+
+	public void SendMoveRequest(int x, int y, String direction) {
+		Message message = new Message(username);
+		message.setXpos(x);
+		message.setYpos(y);
+		message.setDirection(direction);
+		message.setType(MType.MOVE);
+		outgoing.add(message);
+	}
+
+	public void CreatePlayer(int startX, int startY) {
+		fields[startX][startY].setGraphic(new ImageView(hero_up));
+	}
+
+	public void playerMoved(Player player, String direction) {
+		player.setDirection(direction);
+		int x = player.getXpos(),y = player.getYpos();
+		int prev_x = player.getPrev_xpos(), prev_y = player.getPrev_ypos();
+
+		fields[prev_x][prev_y].setGraphic(new ImageView(image_floor));
+//		x+=delta_x;
+//		y+=delta_y;
+
+		if (direction.equals("right")) {
+			fields[x][y].setGraphic(new ImageView(hero_right));
+		};
+		if (direction.equals("left")) {
+			fields[x][y].setGraphic(new ImageView(hero_left));
+		};
+		if (direction.equals("up")) {
+			fields[x][y].setGraphic(new ImageView(hero_up));
+		};
+		if (direction.equals("down")) {
+			fields[x][y].setGraphic(new ImageView(hero_down));
+		};
+
+		player.setXpos(x);
+		player.setYpos(y);
+	}
+
+	public void setScoreList(String score) {
+		scoreList.setText(score);
+	}
+
+	private void CreateClientToServerConnection(Stage stage) {
+		Alert alert = ShowAlertMessage("Forbind til Server", "Indtast IP og/eller Port",
+				"Indtast venligst IP og PORT");
+
+		GridPane pane = new GridPane();
+		pane.setMaxWidth(Double.MAX_VALUE);
+		pane.setHgap(10);
+		pane.setVgap(10);
+		TextField local_IP_Field = new TextField("192.168.0.13");
+		TextField local_PORT_Field = new TextField("50000");
+		TextField local_USER_field = new TextField("User 1");
+
+		local_IP_Field.setMaxWidth(Double.MAX_VALUE);
+		local_PORT_Field.setMaxWidth(Double.MAX_VALUE);
+		local_USER_field.setMaxWidth(Double.MAX_VALUE);
+
+		pane.add(new Label("IP:"), 0, 0);
+		pane.add(local_IP_Field,1,0);
+		pane.add(new Label("PORT:"), 0, 1);
+		pane.add(local_PORT_Field,1,1);
+		pane.add(new Label("USER:"), 0, 2);
+		pane.add(local_USER_field, 1, 2);
+
+		alert.getDialogPane().setContent(pane);
+		alert.setWidth(300);
+		alert.showAndWait();
+
+		if (alert.getResult() == ButtonType.YES) {
+			String IP = local_IP_Field.getText();
+			int PORT = Integer.parseInt(local_PORT_Field.getText());
+			username = local_USER_field.getText();
+
+			LocalClient localClient = new LocalClient(IP, PORT, this);
+			localClient.start();
+
+			Client(stage);
+			SendNewPlayerData(username);
+		}
+	}
+	private Alert ShowAlertMessage(String title, String header, String context) {
+		Alert alert = new Alert(Alert.AlertType.WARNING);
+		alert.setTitle(title);
+		alert.setHeaderText(header);
+		alert.setContentText(context);
+		alert.getButtonTypes().clear();
+		alert.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+
+		return alert;
+	}
+
+
+	public static void main(String[] args) {
+		launch(args);
+	}
+
+	//	public void CreatePlayer(String name, int startX, int startY) {
 //		Player player = new Player(name,startX,startY,"up");
 //		players.put(name, player);
 //		fields[startX][startY].setGraphic(new ImageView(hero_up));
@@ -203,74 +308,5 @@ public class Main_Client extends Application {
 //		}
 //		return null;
 //	}
-
-	private void CreateClientToServerConnection(Stage stage) {
-		Alert alert = ShowAlertMessage("Forbind til Server", "Indtast IP og/eller Port",
-				"Indtast venligst IP og PORT");
-
-		GridPane pane = new GridPane();
-		pane.setMaxWidth(Double.MAX_VALUE);
-		pane.setHgap(10);
-		pane.setVgap(10);
-		TextField local_IP_Field = new TextField("192.168.1.143");
-		TextField local_PORT_Field = new TextField("50000");
-		TextField local_USER_field = new TextField("User 1");
-
-		local_IP_Field.setMaxWidth(Double.MAX_VALUE);
-		local_PORT_Field.setMaxWidth(Double.MAX_VALUE);
-		local_USER_field.setMaxWidth(Double.MAX_VALUE);
-
-		pane.add(new Label("IP:"), 0, 0);
-		pane.add(local_IP_Field,1,0);
-		pane.add(new Label("PORT:"), 0, 1);
-		pane.add(local_PORT_Field,1,1);
-		pane.add(new Label("USER:"), 0, 2);
-		pane.add(local_USER_field, 1, 2);
-
-		alert.getDialogPane().setContent(pane);
-		alert.setWidth(300);
-		alert.showAndWait();
-
-		if (alert.getResult() == ButtonType.YES) {
-			String IP = local_IP_Field.getText();
-			int PORT = Integer.parseInt(local_PORT_Field.getText());
-			username = local_USER_field.getText();
-
-			LocalClient localClient = new LocalClient(IP, PORT, this);
-			localClient.start();
-
-			Client(stage);
-			SendNewPlayerData("NAME," + username);
-		}
-	}
-	private Alert ShowAlertMessage(String title, String header, String context) {
-		Alert alert = new Alert(Alert.AlertType.WARNING);
-		alert.setTitle(title);
-		alert.setHeaderText(header);
-		alert.setContentText(context);
-		alert.getButtonTypes().clear();
-		alert.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
-
-		return alert;
-	}
-
-	private BlockingQueue<Message> outgoing = OutgoingMessageQueue.getOutgoingMessages();
-
-	public void SendNewPlayerData(String user) {
-		Message message = new Message(user);
-		message.setType(MType.DATA);
-		outgoing.add(message);
-	}
-
-	public void SendMoveRequest(int x, int y) {
-		Message message = new Message(username);
-		message.setXpos(x);
-		message.setYpos(y);
-		outgoing.add(message);
-	}
-
-	public static void main(String[] args) {
-		launch(args);
-	}
 }
 
