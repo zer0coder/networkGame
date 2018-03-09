@@ -122,7 +122,11 @@ public class LocalClient extends Thread {
 //                    incomingMessages.add(message);
 //                    System.out.println(message);
                     String[] command = message.split(",");
-                    Platform.runLater(() -> client.playerMoved(Integer.parseInt(command[0]), Integer.parseInt(command[1]), command[2]));
+                    if(command[0].equals("NAME")) {
+                        Platform.runLater(() -> client.CreatePlayer(command[1], Integer.parseInt(command[2]), Integer.parseInt(command[3])));
+                    } else {
+                        Platform.runLater(() -> client.playerMoved(command[0], Integer.parseInt(command[1]), Integer.parseInt(command[2]), command[3]));
+                    }
                 }
 
             } catch (IOException e) {

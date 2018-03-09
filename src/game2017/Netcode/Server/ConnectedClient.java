@@ -47,12 +47,8 @@ public class ConnectedClient extends Thread {
             // Read what the client is sending
             while ((message = inputStream.readLine()) != null) {
 //                System.out.println(message);
-                if(message.equals("NEW_PLAYER")) {
-                    incomingMessages.add(message);
-                } else {
-                    incomingMessages.add(message);
-                    relayMessages.add(message);
-                }
+                incomingMessages.add(message);
+                relayMessages.add(message);
             }
             socket.close();
         } catch (IOException e) {

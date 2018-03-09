@@ -17,7 +17,9 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 public class Main_Client extends Application {
@@ -31,10 +33,12 @@ public class Main_Client extends Application {
 	private static Image hero_right,hero_left,hero_up,hero_down;
 
 	private static Player me;
-	private static List<Player> players = new ArrayList<Player>();
+//	private static List<Player> players = new ArrayList<Player>();
+	private static HashMap<String, Player> players = new HashMap<>();
 
 	private Label[][] fields;
 	private TextArea scoreList;
+	private String username;
 	
 	private  String[] board = {    // 20x20
 			"wwwwwwwwwwwwwwwwwwww",
@@ -134,23 +138,19 @@ public class Main_Client extends Application {
 //				}
 
 				switch (event.getCode()) {
-					case UP:    AddToOutgoingQueue(0 + "," + (-1) + "," + "up");    break;
-					case DOWN:  AddToOutgoingQueue(0 + "," + (+1) + "," + "down");    break;
-					case LEFT:  AddToOutgoingQueue((-1) + "," + (0) + "," + "left");    break;
-					case RIGHT: AddToOutgoingQueue((+1) + "," + (0) + "," + "right");    break;
+					case UP:    AddToOutgoingQueue(username + "," + 0 + "," + (-1) + "," + "up");    break;
+					case DOWN:  AddToOutgoingQueue(username + "," + 0 + "," + (+1) + "," + "down");    break;
+					case LEFT:  AddToOutgoingQueue(username + "," + (-1) + "," + (0) + "," + "left");    break;
+					case RIGHT: AddToOutgoingQueue(username + "," + (+1) + "," + (0) + "," + "right");    break;
 					default: break;
 				}
 			});
 
 			// Setting up standard players
 
-			me = new Player("Orville",9,4,"up");
-			players.add(me);
-			fields[9][4].setGraphic(new ImageView(hero_up));
-
-			Player harry = new Player("Harry",14,15,"up");
-			players.add(harry);
-			fields[14][15].setGraphic(new ImageView(hero_up));
+//			Player harry = new Player("Harry",14,15,"up");
+//			players.add(harry);
+//			fields[14][15].setGraphic(new ImageView(hero_up));
 
 			scoreList.setText(getScoreList());
 		} catch(Exception e) {
@@ -159,12 +159,14 @@ public class Main_Client extends Application {
 	}
 
 	public void CreatePlayer(String name, int startX, int startY) {
-		Player harry = new Player("Harry",14,15,"up");
-		players.add(harry);
-		fields[14][15].setGraphic(new ImageView(hero_up));
+		Player player = new Player(name,startX,startY,"up");
+		players.put(name, player);
+		fields[startX][startY].setGraphic(new ImageView(hero_up));
+		scoreList.setText(getScoreList());
 	}
 
-	public void playerMoved(int delta_x, int delta_y, String direction) {
+	public void playerMoved(String name, int delta_x, int delta_y, String direction) {
+		me = players.get(name);
 		me.setDirection(direction);
 		int x = me.getXpos(),y = me.getYpos();
 
@@ -207,14 +209,15 @@ public class Main_Client extends Application {
 
 	public String getScoreList() {
 		StringBuffer b = new StringBuffer(100);
-		for (Player p : players) {
-			b.append(p+"\r\n");
+		for (Map.Entry<String,Player> p : players.entrySet()) {
+			b.append(p.getValue()+"\r\n");
 		}
 		return b.toString();
 	}
 
 	public Player getPlayerAt(int x, int y) {
-		for (Player p : players) {
+		for (Map.Entry<String,Player> pa : players.entrySet()) {
+			Player p = pa.getValue();
 			if (p.getXpos()==x && p.getYpos()==y) {
 				return p;
 			}
@@ -252,11 +255,13 @@ public class Main_Client extends Application {
 		if (alert.getResult() == ButtonType.YES) {
 			String IP = local_IP_Field.getText();
 			int PORT = Integer.parseInt(local_PORT_Field.getText());
+			username = local_USER_field.getText();
 
 			LocalClient localClient = new LocalClient(IP, PORT, this);
 			localClient.start();
 
 			Client(stage);
+			AddToOutgoingQueue("NAME," + username + ",2,2");
 		}
 	}
 	private Alert ShowAlertMessage(String title, String header, String context) {
