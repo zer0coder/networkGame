@@ -126,9 +126,6 @@ public class LocalClient extends Thread {
                     String[] command = message.split(",");
                     if(command[0].equals("NAME")) {
                         Platform.runLater(() -> client.CreatePlayer(command[1], Integer.parseInt(command[2]), Integer.parseInt(command[3])));
-                        for(Map.Entry<String, Player> entry : client.getPlayers().entrySet()) {
-                            client.AddToOutgoingQueue("NAME," + entry.getKey() + ",2,2");
-                        }
                     } else {
                         Platform.runLater(() -> client.playerMoved(command[0], Integer.parseInt(command[1]), Integer.parseInt(command[2]), command[3]));
                     }

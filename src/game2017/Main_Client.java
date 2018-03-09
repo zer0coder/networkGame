@@ -252,7 +252,7 @@ public class Main_Client extends Application {
 			localClient.start();
 
 			Client(stage);
-			AddToOutgoingQueue("NAME," + username + ",2,2");
+			AddToOutgoingQueue("NAME," + username);
 		}
 	}
 	private Alert ShowAlertMessage(String title, String header, String context) {
