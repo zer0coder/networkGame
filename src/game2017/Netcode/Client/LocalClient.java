@@ -1,6 +1,7 @@
 package game2017.Netcode.Client;
 
 import game2017.Main_Client;
+import game2017.Model.Player;
 import game2017.StorageData.Queues.IncomingMessageQueue;
 import game2017.StorageData.Queues.OutgoingMessageQueue;
 import javafx.application.Platform;
@@ -12,6 +13,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -124,6 +126,9 @@ public class LocalClient extends Thread {
                     String[] command = message.split(",");
                     if(command[0].equals("NAME")) {
                         Platform.runLater(() -> client.CreatePlayer(command[1], Integer.parseInt(command[2]), Integer.parseInt(command[3])));
+                        for(Map.Entry<String, Player> entry : client.getPlayers().entrySet()) {
+                            client.AddToOutgoingQueue("NAME," + entry.getKey() + ",2,2");
+                        }
                     } else {
                         Platform.runLater(() -> client.playerMoved(command[0], Integer.parseInt(command[1]), Integer.parseInt(command[2]), command[3]));
                     }

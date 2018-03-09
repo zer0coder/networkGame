@@ -33,7 +33,12 @@ public class Main_Client extends Application {
 	private static Image hero_right,hero_left,hero_up,hero_down;
 
 	private static Player me;
-//	private static List<Player> players = new ArrayList<Player>();
+
+	public static HashMap<String, Player> getPlayers() {
+		return players;
+	}
+
+	//	private static List<Player> players = new ArrayList<Player>();
 	private static HashMap<String, Player> players = new HashMap<>();
 
 	private Label[][] fields;
@@ -129,14 +134,6 @@ public class Main_Client extends Application {
 			primaryStage.show();
 
 			scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-//				switch (event.getCode()) {
-//					case UP:    playerMoved(0,-1,"up");    break;
-//					case DOWN:  playerMoved(0,+1,"down");  break;
-//					case LEFT:  playerMoved(-1,0,"left");  break;
-//					case RIGHT: playerMoved(+1,0,"right"); break;
-//					default: break;
-//				}
-
 				switch (event.getCode()) {
 					case UP:    AddToOutgoingQueue(username + "," + 0 + "," + (-1) + "," + "up");    break;
 					case DOWN:  AddToOutgoingQueue(username + "," + 0 + "," + (+1) + "," + "down");    break;
@@ -145,12 +142,6 @@ public class Main_Client extends Application {
 					default: break;
 				}
 			});
-
-			// Setting up standard players
-
-//			Player harry = new Player("Harry",14,15,"up");
-//			players.add(harry);
-//			fields[14][15].setGraphic(new ImageView(hero_up));
 
 			scoreList.setText(getScoreList());
 		} catch(Exception e) {
@@ -276,7 +267,7 @@ public class Main_Client extends Application {
 	}
 
 	private BlockingQueue<String> outgoing = OutgoingMessageQueue.getOutgoingMessages();
-	private void AddToOutgoingQueue(String command) {
+	public void AddToOutgoingQueue(String command) {
 		outgoing.add(command);
 	}
 
