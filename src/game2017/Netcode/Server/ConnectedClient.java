@@ -2,6 +2,7 @@ package game2017.Netcode.Server;
 
 import game2017.Model.Player;
 import game2017.StorageData.Queues.IncomingMessageQueue;
+import game2017.StorageData.Queues.RelayMessageQueue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,6 +24,7 @@ public class ConnectedClient extends Thread {
     private BufferedReader inputStream;
     private String message;
     private BlockingQueue<String> incomingMessages;
+    private BlockingQueue<String> relayMessages;
     private Player player;
     private List<Player> players = new ArrayList<Player>();
     private String[] board;
@@ -37,18 +39,19 @@ public class ConnectedClient extends Thread {
         try {
             inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             incomingMessages = IncomingMessageQueue.getIncomingMessages();
+            relayMessages = RelayMessageQueue.getRelayMessages();
 
             // TODO: Read User info
-            message = inputStream.readLine();
+//            message = inputStream.readLine();
 
             // Read what the client is sending
-            while (message != null) {
-                message = inputStream.readLine();
-                System.out.println(message);
+            while ((message = inputStream.readLine()) != null) {
+//                System.out.println(message);
                 if(message.equals("NEW_PLAYER")) {
                     incomingMessages.add(message);
                 } else {
                     incomingMessages.add(message);
+                    relayMessages.add(message);
                 }
             }
             socket.close();

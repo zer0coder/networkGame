@@ -1,7 +1,9 @@
 package game2017.Netcode.Client;
 
+import game2017.Main_Client;
 import game2017.StorageData.Queues.IncomingMessageQueue;
 import game2017.StorageData.Queues.OutgoingMessageQueue;
+import javafx.application.Platform;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,10 +26,12 @@ public class LocalClient extends Thread {
     private String serverName;
     private BlockingQueue<String> outgoingMessages;
     private BlockingQueue<String> incomingMessages;
+    private Main_Client client;
 
-    public LocalClient(String IP, int portNumber) {
+    public LocalClient(String IP, int portNumber, Main_Client client) {
         this.serverName = IP;
         this.portNumber = portNumber;
+        this.client = client;
     }
 
     /**
@@ -73,7 +77,7 @@ public class LocalClient extends Thread {
         if (socket != null) {
             System.out.println("Connected to " + socket);
 
-            Reciever reciever = new Reciever(socket);
+            Reciever reciever = new Reciever(socket, client);
             reciever.start();
 
             try {
@@ -101,27 +105,30 @@ public class LocalClient extends Thread {
 
         Socket socket;
         BufferedReader inputStream;
+        Main_Client client;
 
-        Reciever(Socket socket) {
+        Reciever(Socket socket, Main_Client client) {
             this.socket = socket;
+            this.client = client;
         }
 
         public void run() {
+            System.out.println("Local client - reciever running...");
             try {
                 inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 String message;
 
-                message = inputStream.readLine();
-                System.out.println(message);
-                while(message != null) {
-                    message = inputStream.readLine();
-                    incomingMessages.add(message);
-                    System.out.println(message);
+                while((message = inputStream.readLine()) != null) {
+//                    incomingMessages.add(message);
+//                    System.out.println(message);
+                    String[] command = message.split(",");
+                    Platform.runLater(() -> client.playerMoved(Integer.parseInt(command[0]), Integer.parseInt(command[1]), command[2]));
                 }
 
             } catch (IOException e) {
                 System.out.println("Reciever error: " + e.getMessage());
             }
+            System.out.println("Local client - reciever dead...");
         }
     }
 }

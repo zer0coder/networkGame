@@ -1,6 +1,7 @@
 package game2017.Netcode.Server;
 
 import game2017.StorageData.Maps;
+import game2017.StorageData.Queues.RelayMessageQueue;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -8,6 +9,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Author:  Francisco
@@ -87,20 +90,30 @@ public class CentralServer extends Thread {
         return res;
     }
 
+    private void initializeRelayDirector() {
+        MessageHandler relayDirector = new MessageHandler();
+        relayDirector.start();
+    }
+
     public void run() {
         printLocalHostAddress();
         registerOnPort();
         loadMaps();
+        initializeRelayDirector();
 
 
+        BlockingQueue<String> relayQueue;
 
         while (true) {
             Socket socket = waitForConnectionFromClient();
+            relayQueue = new LinkedBlockingQueue<>();
+            RelayMessageQueue.AddRelayQueue(relayQueue);
 
             if (socket != null) {
                 ConnectedClient connectedClient = new ConnectedClient(socket, Maps.getMap(mapNumber));
-//                MessageRelay relay = new MessageRelay(socket, )
+                MessageRelay relay = new MessageRelay(socket, relayQueue);
                 connectedClient.start();
+                relay.start();
                 System.out.println("Connection from " + socket);
 
 

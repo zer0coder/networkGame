@@ -17,7 +17,7 @@ public class MessageRelay extends Thread {
     private Socket socket;
     private BlockingQueue<String> relayMessages;
 
-    public MessageRelay(Socket socket, LinkedBlockingQueue<String> queue) {
+    public MessageRelay(Socket socket, BlockingQueue<String> queue) {
         this.socket = socket;
         this.relayMessages = queue;
     }
@@ -33,6 +33,8 @@ public class MessageRelay extends Thread {
             // Read what the client is sending
             while ((message = relayMessages.take()) != null) {
                 outputstream.println(message);
+                outputstream.flush();
+//                System.out.println("relayed... " + message);
             }
             socket.close();
         } catch (IOException e) {

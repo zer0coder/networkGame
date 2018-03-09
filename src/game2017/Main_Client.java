@@ -125,11 +125,19 @@ public class Main_Client extends Application {
 			primaryStage.show();
 
 			scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+//				switch (event.getCode()) {
+//					case UP:    playerMoved(0,-1,"up");    break;
+//					case DOWN:  playerMoved(0,+1,"down");  break;
+//					case LEFT:  playerMoved(-1,0,"left");  break;
+//					case RIGHT: playerMoved(+1,0,"right"); break;
+//					default: break;
+//				}
+
 				switch (event.getCode()) {
-					case UP:    playerMoved(0,-1,"up");    break;
-					case DOWN:  playerMoved(0,+1,"down");  break;
-					case LEFT:  playerMoved(-1,0,"left");  break;
-					case RIGHT: playerMoved(+1,0,"right"); break;
+					case UP:    AddToOutgoingQueue(0 + "," + (-1) + "," + "up");    break;
+					case DOWN:  AddToOutgoingQueue(0 + "," + (+1) + "," + "down");    break;
+					case LEFT:  AddToOutgoingQueue((-1) + "," + (0) + "," + "left");    break;
+					case RIGHT: AddToOutgoingQueue((+1) + "," + (0) + "," + "right");    break;
 					default: break;
 				}
 			});
@@ -150,11 +158,17 @@ public class Main_Client extends Application {
 		}
 	}
 
+	public void CreatePlayer(String name, int startX, int startY) {
+		Player harry = new Player("Harry",14,15,"up");
+		players.add(harry);
+		fields[14][15].setGraphic(new ImageView(hero_up));
+	}
+
 	public void playerMoved(int delta_x, int delta_y, String direction) {
 		me.setDirection(direction);
 		int x = me.getXpos(),y = me.getYpos();
 
-		AddToOutgoingQueue("X: " + x + ", Y: " + y + ", DIR: " + direction);
+//		AddToOutgoingQueue(x + "," + y + "," + direction);
 
 		if (board[y+delta_y].charAt(x+delta_x)=='w') {
 			me.addPoints(-1);
@@ -239,7 +253,7 @@ public class Main_Client extends Application {
 			String IP = local_IP_Field.getText();
 			int PORT = Integer.parseInt(local_PORT_Field.getText());
 
-			LocalClient localClient = new LocalClient(IP, PORT);
+			LocalClient localClient = new LocalClient(IP, PORT, this);
 			localClient.start();
 
 			Client(stage);
