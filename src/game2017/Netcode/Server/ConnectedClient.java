@@ -2,10 +2,6 @@ package game2017.Netcode.Server;
 
 import game2017.Model.Player;
 import game2017.StorageData.Queues.IncomingMessageQueue;
-import game2017.StorageData.Queues.RelayMessageQueue;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.image.ImageView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,10 +22,7 @@ public class ConnectedClient extends Thread {
     private Socket socket;
     private BufferedReader inputStream;
     private String message;
-    private String relay;
     private BlockingQueue<String> incomingMessages;
-    private BlockingQueue<String> relayMessages;
-
     private Player player;
     private List<Player> players = new ArrayList<Player>();
     private String[] board;
@@ -44,7 +37,6 @@ public class ConnectedClient extends Thread {
         try {
             inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             incomingMessages = IncomingMessageQueue.getIncomingMessages();
-            relayMessages = RelayMessageQueue.getRelayMessages();
 
             // TODO: Read User info
             message = inputStream.readLine();
@@ -56,12 +48,9 @@ public class ConnectedClient extends Thread {
                 message = inputStream.readLine();
                 System.out.println(message);
                 if(message.equals("NEW_PLAYER")) {
-//                        incomingMessages.add(message);
-                    relayMessages.add(message);
+                    incomingMessages.add(message);
                 } else {
-//                        incomingMessages.add(message);
-                    relay = "relay"; // TODO
-                    relayMessages.add(relay);
+                    incomingMessages.add(message);
                 }
             }
             socket.close();

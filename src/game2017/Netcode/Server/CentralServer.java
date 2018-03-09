@@ -1,8 +1,6 @@
 package game2017.Netcode.Server;
 
 import game2017.StorageData.Maps;
-import game2017.StorageData.Queues.IncomingMessageQueue;
-import game2017.StorageData.Queues.RelayMessageQueue;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -121,43 +119,4 @@ public class CentralServer extends Thread {
         System.out.println("Map: " + mapNumber);
     }
 
-//    private class ClientThread extends Thread {
-//
-//        Socket socket;
-//        BufferedReader inputStream;
-//        String message;
-//        String relay;
-//
-//        ClientThread(Socket socket) {
-//            this.socket = socket;
-//        }
-//
-//        public void run() {
-//
-//            try {
-//                inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//
-//                message = inputStream.readLine();
-//                // Read what the client is sending
-//                while (message != null) {
-//                    message = inputStream.readLine();
-//                    if(message.equals("NEW_PLAYER")) {
-////                        incomingMessages.add(message);
-//                        relayMessages.add(message);
-//                    } else {
-////                        incomingMessages.add(message);
-//                        relay = "relay"; // TODO
-//                        relayMessages.add(relay);
-//                    }
-//                }
-//                socket.close();
-//            } catch (IOException e) {
-//                // We report but otherwise ignore IOExceptions
-//                System.out.println("ClientThread error: " + e);
-//                System.exit(1);
-//
-//            }
-//            System.out.println("Connection closed by client.");
-//        }
-//    }
 }
