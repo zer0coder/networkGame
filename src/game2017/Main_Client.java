@@ -216,13 +216,12 @@ public class Main_Client extends Application {
 			LocalClient localClient = new LocalClient(IP, PORT, this);
 			localClient.start();
 
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             SendNewPlayerData(username);
-
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			Client(stage);
 		}
 	}

@@ -131,8 +131,8 @@ public class LocalClient extends Thread {
                             client.setScoreList(message.getScoreList());
                         });
                     } else if (message.getType().equals(MType.DATA)) {
+                        client.setMap(message.getBoard());
                         Platform.runLater(() -> {
-                            client.setMap(message.getBoard());
                             client.CreatePlayer(message.getPlayer().getXpos(), message.getPlayer().getYpos());
                         });
                     }
