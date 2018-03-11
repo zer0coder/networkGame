@@ -60,14 +60,6 @@ public class Main_Client extends Application {
 			"wwwwwwwwwwwwwwwwwwww"
 	};
 
-	
-	// -------------------------------------------
-	// | Maze: (0,0)              | Score: (1,0) |
-	// |-----------------------------------------|
-	// | boardGrid (0,1)          | scorelist    |
-	// |                          | (1,1)        |
-	// -------------------------------------------
-
 	@Override
 	public void start(Stage primaryStage) {
 		CreateClientToServerConnection(primaryStage);
@@ -167,8 +159,6 @@ public class Main_Client extends Application {
 		int prev_x = player.getPrev_xpos(), prev_y = player.getPrev_ypos();
 
 		fields[prev_x][prev_y].setGraphic(new ImageView(image_floor));
-//		x+=delta_x;
-//		y+=delta_y;
 
 		if (direction.equals("right")) {
 			fields[x][y].setGraphic(new ImageView(hero_right));
@@ -246,67 +236,5 @@ public class Main_Client extends Application {
 		launch(args);
 	}
 
-	//	public void CreatePlayer(String name, int startX, int startY) {
-//		Player player = new Player(name,startX,startY,"up");
-//		players.put(name, player);
-//		fields[startX][startY].setGraphic(new ImageView(hero_up));
-//		scoreList.setText(getScoreList());
-//	}
-
-//	public void playerMoved(Player player, int delta_x, int delta_y, String direction) {
-//		player.setDirection(direction);
-//		int x = player.getXpos(),y = player.getYpos();
-//
-//		if (board[y+delta_y].charAt(x+delta_x)=='w') {
-//			player.addPoints(-1);
-//		}
-//		else {
-//			Player p = getPlayerAt(x+delta_x,y+delta_y);
-//			if (p!=null) {
-//              player.addPoints(10);
-//              p.addPoints(-10);
-//			} else {
-//				player.addPoints(1);
-//
-//				fields[x][y].setGraphic(new ImageView(image_floor));
-//				x+=delta_x;
-//				y+=delta_y;
-//
-//				if (direction.equals("right")) {
-//					fields[x][y].setGraphic(new ImageView(hero_right));
-//				};
-//				if (direction.equals("left")) {
-//					fields[x][y].setGraphic(new ImageView(hero_left));
-//				};
-//				if (direction.equals("up")) {
-//					fields[x][y].setGraphic(new ImageView(hero_up));
-//				};
-//				if (direction.equals("down")) {
-//					fields[x][y].setGraphic(new ImageView(hero_down));
-//				};
-//
-//				player.setXpos(x);
-//				player.setYpos(y);
-//			}
-//		}
-//		scoreList.setText(getScoreList());
-//	}
-//
-//	public String getScoreList() {
-//		StringBuffer b = new StringBuffer(100);
-//		for (Player p : players) {
-//			b.append(p.getValue()+"\r\n");
-//		}
-//		return b.toString();
-//	}
-//
-//	public Player getPlayerAt(int x, int y) {
-//		for (Player p : players) {
-//			if (p.getXpos()==x && p.getYpos()==y) {
-//				return p;
-//			}
-//		}
-//		return null;
-//	}
 }
 

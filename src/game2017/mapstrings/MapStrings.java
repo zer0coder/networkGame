@@ -57,7 +57,7 @@ public class MapStrings {
             "w            ww    w",
             "w           ww     w",
             "w          ww      w",
-            "w     wwww         w",
+            "w     wwww        w",
             "w       wwwww      w",
             "w            ww    w",
             "w             ww   w",

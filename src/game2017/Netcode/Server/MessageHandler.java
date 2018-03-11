@@ -23,6 +23,7 @@ public class MessageHandler extends Thread {
     private HashMap<String, Player> players = new HashMap<>();
     private String scoreList;
     private Message message;
+    private int playerCounter = 0;
 
     public MessageHandler(int num) {
         this.board = Maps.getMap(num);
@@ -39,7 +40,7 @@ public class MessageHandler extends Thread {
                 MType type = message.getType();
 
                 if(type.equals(MType.DATA)) {
-                    Player player = CreatePlayer(message.getUsername(), 2, 2);
+                    Player player = CreatePlayer(message.getUsername());
                     relayMessage.setPlayers(players);
                     relayMessage.setScoreList(getScoreList());
                     relayMessage.setPlayer(player);
@@ -74,11 +75,34 @@ public class MessageHandler extends Thread {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public Player CreatePlayer(String name, int startX, int startY) {
+    public Player CreatePlayer(String name) {
+
+        int startX;
+        int startY;
+
+        if (playerCounter == 0){
+            startX = 2;
+            startY = 2;
+        }
+        else if (playerCounter == 1){
+            startX = 19;
+            startY = 19;
+        }
+        else if (playerCounter == 3){
+            startX = 19;
+            startY = 2;
+        }
+        else{
+            startX = 2;
+            startY = 19;
+        }
+        playerCounter++;
+
 		Player player = new Player(name,startX,startY,"up");
 		player.setPrev_xpos(startX);
 		player.setPrev_ypos(startY);
 		players.put(name, player);
+		
 		return player;
 	}
 

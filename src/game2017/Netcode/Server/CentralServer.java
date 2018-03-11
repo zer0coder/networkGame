@@ -81,12 +81,12 @@ public class CentralServer extends Thread {
      * socket of the connection, null if there were any failures.
      */
     private Socket waitForConnectionFromClient() {
-        Socket res = null;
+        Socket res;
         try {
             res = serverSocket.accept();
 
         } catch (IOException e) {
-            // We return null on IOExceptions
+            return null;
         }
         return res;
     }
@@ -101,7 +101,6 @@ public class CentralServer extends Thread {
         registerOnPort();
         loadMaps();
         initializeRelayDirector();
-
 
         BlockingQueue<Message> relayQueue;
 
