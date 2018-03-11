@@ -82,20 +82,20 @@ public class MessageHandler extends Thread {
         int startY;
 
         if (playerCounter == 0){
-            startX = 2;
-            startY = 2;
+            startX = 1;
+            startY = 1;
         }
         else if (playerCounter == 1){
-            startX = 19;
-            startY = 19;
+            startX = 18;
+            startY = 18;
         }
         else if (playerCounter == 3){
-            startX = 19;
-            startY = 2;
+            startX = 18;
+            startY = 1;
         }
         else{
-            startX = 2;
-            startY = 19;
+            startX = 1;
+            startY = 18;
         }
         playerCounter++;
 

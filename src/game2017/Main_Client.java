@@ -31,34 +31,34 @@ public class Main_Client extends Application {
 	private static Image image_wall;
 	private static Image hero_right,hero_left,hero_up,hero_down;
 
-//	private static Player player;
-
 	private Label[][] fields;
 	private TextArea scoreList;
 	private String username;
-	
-	private  String[] board = {    // 20x20
-			"wwwwwwwwwwwwwwwwwwww",
-			"w        ww        w",
-			"w w  w  www w  w  ww",
-			"w w  w   ww w  w  ww",
-			"w  w               w",
-			"w w w w w w w  w  ww",
-			"w w     www w  w  ww",
-			"w w     w w w  w  ww",
-			"w   w w  w  w  w   w",
-			"w     w  w  w  w   w",
-			"w ww ww        w  ww",
-			"w  w w    w    w  ww",
-			"w        ww w  w  ww",
-			"w         w w  w  ww",
-			"w        w     w  ww",
-			"w  w              ww",
-			"w  w www  w w  ww ww",
-			"w w      ww w     ww",
-			"w   w   ww  w      w",
-			"wwwwwwwwwwwwwwwwwwww"
-	};
+
+	private String[] board;
+
+//	private  String[] board = {    // 20x20
+//			"wwwwwwwwwwwwwwwwwwww",
+//			"w        ww        w",
+//			"w w  w  www w  w  ww",
+//			"w w  w   ww w  w  ww",
+//			"w  w               w",
+//			"w w w w w w w  w  ww",
+//			"w w     www w  w  ww",
+//			"w w     w w w  w  ww",
+//			"w   w w  w  w  w   w",
+//			"w     w  w  w  w   w",
+//			"w ww ww        w  ww",
+//			"w  w w    w    w  ww",
+//			"w        ww w  w  ww",
+//			"w         w w  w  ww",
+//			"w        w     w  ww",
+//			"w  w              ww",
+//			"w  w www  w w  ww ww",
+//			"w w      ww w     ww",
+//			"w   w   ww  w      w",
+//			"wwwwwwwwwwwwwwwwwwww"
+//	};
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -216,8 +216,14 @@ public class Main_Client extends Application {
 			LocalClient localClient = new LocalClient(IP, PORT, this);
 			localClient.start();
 
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            SendNewPlayerData(username);
+
 			Client(stage);
-			SendNewPlayerData(username);
 		}
 	}
 	private Alert ShowAlertMessage(String title, String header, String context) {
