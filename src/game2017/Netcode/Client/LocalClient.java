@@ -4,7 +4,6 @@ import game2017.Main_Client;
 import game2017.Model.MType;
 import game2017.Model.Message;
 import game2017.Model.Player;
-import game2017.StorageData.Queues.IncomingMessageQueue;
 import game2017.StorageData.Queues.OutgoingMessageQueue;
 import javafx.application.Platform;
 
@@ -76,8 +75,8 @@ public class LocalClient extends Thread {
         if (socket != null) {
             System.out.println("Connected to " + socket);
 
-            Reciever reciever = new Reciever(socket, client);
-            reciever.start();
+            Receiver receiver = new Receiver(socket, client);
+            receiver.start();
 
             try {
 
@@ -101,20 +100,20 @@ public class LocalClient extends Thread {
         System.out.println("Local client dead...");
     }
 
-    private class Reciever extends Thread {
+    private class Receiver extends Thread {
 
         private Socket socket;
         private ObjectInputStream inputStream;
         private Main_Client client;
         private Message message;
 
-        Reciever(Socket socket, Main_Client client) {
+        Receiver(Socket socket, Main_Client client) {
             this.socket = socket;
             this.client = client;
         }
 
         public void run() {
-            System.out.println("Reciever running...");
+            System.out.println("Receiver running...");
             try {
                 inputStream = new ObjectInputStream(socket.getInputStream());
 
@@ -122,7 +121,7 @@ public class LocalClient extends Thread {
 
                     message = (Message) inputStream.readObject();
 
-                    System.out.println("Reciever: \n" + message.toString());
+                    System.out.println("Receiver: \n" + message.toString());
                     if(message.getType().equals(MType.MOVE)) {
                         Platform.runLater(() -> {
                             for(Map.Entry<String, Player> p : message.getPlayers().entrySet()) {
@@ -133,17 +132,18 @@ public class LocalClient extends Thread {
                         });
                     } else if (message.getType().equals(MType.DATA)) {
                         Platform.runLater(() -> {
+                            client.setMap(message.getBoard());
                             client.CreatePlayer(message.getPlayer().getXpos(), message.getPlayer().getYpos());
                         });
                     }
                 }
 
             } catch (IOException e) {
-                System.out.println("Reciever error: " + e.getMessage());
+                System.out.println("Receiver error: " + e.getMessage());
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            System.out.println("Reciever dead...");
+            System.out.println("Receiver dead...");
         }
     }
 }

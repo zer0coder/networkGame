@@ -11,6 +11,7 @@ import java.util.HashMap;
  */
 public class Message implements Serializable {
 
+    private String[] board;
     private HashMap<String, Player> players;
     private Player player;
     private String scoreList;
@@ -20,6 +21,14 @@ public class Message implements Serializable {
     private int ypos;
     private int point;
     private String direction;
+
+    public String[] getBoard() {
+        return board;
+    }
+
+    public void setBoard(String[] board) {
+        this.board = board;
+    }
 
     public Message(String username) {
         this.username = username;

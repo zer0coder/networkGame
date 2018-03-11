@@ -231,6 +231,9 @@ public class Main_Client extends Application {
 		return alert;
 	}
 
+	public void setMap(String[] map){
+	    this.board = map;
+    }
 
 	public static void main(String[] args) {
 		launch(args);

@@ -118,7 +118,7 @@ public class CentralServer extends Thread {
 
 
             } else {
-                // We rather agressively terminate the server on the first connection exception
+                // We rather aggressively terminate the server on the first connection exception
                 break;
             }
         }
@@ -130,8 +130,8 @@ public class CentralServer extends Thread {
     private void loadMaps() {
         Maps maps = new Maps();
         Random random = new Random();
-//        mapNumber = random.nextInt(maps.getNumberOfMaps());
-        mapNumber = 0;
+        mapNumber = random.nextInt(maps.getNumberOfMaps());
+//        mapNumber = 0;
         System.out.println("Map: " + mapNumber);
     }
 

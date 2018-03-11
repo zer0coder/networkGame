@@ -41,6 +41,7 @@ public class MessageHandler extends Thread {
 
                 if(type.equals(MType.DATA)) {
                     Player player = CreatePlayer(message.getUsername());
+                    relayMessage.setBoard(board);
                     relayMessage.setPlayers(players);
                     relayMessage.setScoreList(getScoreList());
                     relayMessage.setPlayer(player);
@@ -102,7 +103,7 @@ public class MessageHandler extends Thread {
 		player.setPrev_xpos(startX);
 		player.setPrev_ypos(startY);
 		players.put(name, player);
-		
+
 		return player;
 	}
 
