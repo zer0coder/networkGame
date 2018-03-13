@@ -76,7 +76,7 @@ public class Maps {
                 "w            ww    w",
                 "w           ww     w",
                 "w          ww      w",
-                "w     wwwwww       w",
+                "w     wwww         w",
                 "w       wwwww      w",
                 "w            ww    w",
                 "w             ww   w",
